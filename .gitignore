@@ -37,6 +37,9 @@ yarn-error.log*
 # local postgres instance
 /.pgdata
 
+# prisma generated client
+/src/generated
+
 # vercel
 .vercel
 

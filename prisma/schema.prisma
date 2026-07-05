@@ -1,0 +1,294 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MembershipRole {
+  OWNER
+  DENTIST
+  RECEPTIONIST
+}
+
+enum BookingMode {
+  INSTANT
+  APPROVAL
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  HIDDEN
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum SubscriptionPlan {
+  TRIAL
+  BASIC
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  OPEN
+  PAID
+  VOID
+}
+
+enum NotificationChannel {
+  SMS
+  EMAIL
+}
+
+enum NotificationStatus {
+  SCHEDULED
+  SENT
+  FAILED
+}
+
+model User {
+  id              String        @id @default(uuid()) @db.Uuid
+  phone           String?       @unique
+  email           String?       @unique
+  passwordHash    String?       @map("password_hash")
+  name            String
+  locale          String        @default("sq")
+  isPlatformAdmin Boolean       @default(false) @map("is_platform_admin")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  memberships     Membership[]
+  appointments    Appointment[]
+  reviews         Review[]
+
+  @@map("users")
+}
+
+model Clinic {
+  id                      String              @id @default(uuid()) @db.Uuid
+  slug                    String              @unique
+  name                    String
+  city                    String
+  address                 String
+  phone                   String
+  aboutSq                 String              @default("") @map("about_sq")
+  aboutEn                 String              @default("") @map("about_en")
+  logoUrl                 String?             @map("logo_url")
+  brandColor              String              @default("#0ea5e9") @map("brand_color")
+  bookingMode             BookingMode         @default(INSTANT) @map("booking_mode")
+  cancellationWindowHours Int                 @default(24) @map("cancellation_window_hours")
+  timezone                String              @default("Europe/Belgrade")
+  published               Boolean             @default(false)
+  approvedAt              DateTime?           @map("approved_at")
+  createdAt               DateTime            @default(now()) @map("created_at")
+  memberships             Membership[]
+  services                Service[]
+  scheduleExceptions      ScheduleException[]
+  appointments            Appointment[]
+  reviews                 Review[]
+  payments                Payment[]
+  subscription            Subscription?
+  notifications           Notification[]
+
+  @@map("clinics")
+}
+
+model Membership {
+  id           String              @id @default(uuid()) @db.Uuid
+  userId       String              @map("user_id") @db.Uuid
+  clinicId     String              @map("clinic_id") @db.Uuid
+  role         MembershipRole
+  title        String?
+  bio          String?
+  photoUrl     String?             @map("photo_url")
+  createdAt    DateTime            @default(now()) @map("created_at")
+  user         User                @relation(fields: [userId], references: [id])
+  clinic       Clinic              @relation(fields: [clinicId], references: [id])
+  services     DentistService[]
+  schedules    Schedule[]
+  exceptions   ScheduleException[]
+  appointments Appointment[]
+
+  @@unique([userId, clinicId])
+  @@map("memberships")
+}
+
+model Service {
+  id           String           @id @default(uuid()) @db.Uuid
+  clinicId     String           @map("clinic_id") @db.Uuid
+  nameSq       String           @map("name_sq")
+  nameEn       String           @map("name_en")
+  durationMin  Int              @map("duration_min")
+  priceEur     Decimal          @map("price_eur") @db.Decimal(10, 2)
+  depositEur   Decimal?         @map("deposit_eur") @db.Decimal(10, 2)
+  active       Boolean          @default(true)
+  clinic       Clinic           @relation(fields: [clinicId], references: [id])
+  dentists     DentistService[]
+  appointments Appointment[]
+
+  @@map("services")
+}
+
+model DentistService {
+  membershipId String     @map("membership_id") @db.Uuid
+  serviceId    String     @map("service_id") @db.Uuid
+  membership   Membership @relation(fields: [membershipId], references: [id])
+  service      Service    @relation(fields: [serviceId], references: [id])
+
+  @@id([membershipId, serviceId])
+  @@map("dentist_services")
+}
+
+model Schedule {
+  id           String     @id @default(uuid()) @db.Uuid
+  membershipId String     @map("membership_id") @db.Uuid
+  weekday      Int // 0=Sunday .. 6=Saturday
+  startMin     Int        @map("start_min") // minutes from midnight, clinic tz
+  endMin       Int        @map("end_min")
+  membership   Membership @relation(fields: [membershipId], references: [id])
+
+  @@map("schedules")
+}
+
+model ScheduleException {
+  id           String      @id @default(uuid()) @db.Uuid
+  clinicId     String      @map("clinic_id") @db.Uuid
+  membershipId String?     @map("membership_id") @db.Uuid // null = clinic-wide
+  date         DateTime    @db.Date
+  closed       Boolean     @default(true)
+  startMin     Int?        @map("start_min") // set when altered hours instead of closed
+  endMin       Int?        @map("end_min")
+  clinic       Clinic      @relation(fields: [clinicId], references: [id])
+  membership   Membership? @relation(fields: [membershipId], references: [id])
+
+  @@map("schedule_exceptions")
+}
+
+model Appointment {
+  id            String            @id @default(uuid()) @db.Uuid
+  clinicId      String            @map("clinic_id") @db.Uuid
+  membershipId  String            @map("membership_id") @db.Uuid // the dentist
+  patientUserId String            @map("patient_user_id") @db.Uuid
+  serviceId     String            @map("service_id") @db.Uuid
+  startsAt      DateTime          @map("starts_at")
+  endsAt        DateTime          @map("ends_at")
+  status        AppointmentStatus
+  notes         String?
+  manageToken   String            @unique @default(uuid()) @map("manage_token")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  clinic        Clinic            @relation(fields: [clinicId], references: [id])
+  membership    Membership        @relation(fields: [membershipId], references: [id])
+  patient       User              @relation(fields: [patientUserId], references: [id])
+  service       Service           @relation(fields: [serviceId], references: [id])
+  review        Review?
+  payment       Payment?
+
+  @@map("appointments")
+}
+
+model Review {
+  id            String       @id @default(uuid()) @db.Uuid
+  clinicId      String       @map("clinic_id") @db.Uuid
+  patientUserId String       @map("patient_user_id") @db.Uuid
+  appointmentId String       @unique @map("appointment_id") @db.Uuid
+  rating        Int
+  comment       String?
+  status        ReviewStatus @default(PUBLISHED)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  clinic        Clinic       @relation(fields: [clinicId], references: [id])
+  patient       User         @relation(fields: [patientUserId], references: [id])
+  appointment   Appointment  @relation(fields: [appointmentId], references: [id])
+
+  @@map("reviews")
+}
+
+model Payment {
+  id            String        @id @default(uuid()) @db.Uuid
+  clinicId      String        @map("clinic_id") @db.Uuid
+  appointmentId String?       @unique @map("appointment_id") @db.Uuid
+  amountEur     Decimal       @map("amount_eur") @db.Decimal(10, 2)
+  provider      String
+  providerRef   String?       @map("provider_ref")
+  status        PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  clinic        Clinic        @relation(fields: [clinicId], references: [id])
+  appointment   Appointment?  @relation(fields: [appointmentId], references: [id])
+
+  @@map("payments")
+}
+
+model Subscription {
+  id               String             @id @default(uuid()) @db.Uuid
+  clinicId         String             @unique @map("clinic_id") @db.Uuid
+  plan             SubscriptionPlan   @default(TRIAL)
+  status           SubscriptionStatus @default(ACTIVE)
+  trialEndsAt      DateTime?          @map("trial_ends_at")
+  currentPeriodEnd DateTime?          @map("current_period_end")
+  clinic           Clinic             @relation(fields: [clinicId], references: [id])
+  invoices         Invoice[]
+
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id             String        @id @default(uuid()) @db.Uuid
+  subscriptionId String        @map("subscription_id") @db.Uuid
+  amountEur      Decimal       @map("amount_eur") @db.Decimal(10, 2)
+  periodStart    DateTime      @map("period_start")
+  periodEnd      DateTime      @map("period_end")
+  status         InvoiceStatus @default(OPEN)
+  paidAt         DateTime?     @map("paid_at")
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id])
+
+  @@map("invoices")
+}
+
+model OtpCode {
+  id         String    @id @default(uuid()) @db.Uuid
+  phone      String
+  codeHash   String    @map("code_hash")
+  expiresAt  DateTime  @map("expires_at")
+  attempts   Int       @default(0)
+  consumedAt DateTime? @map("consumed_at")
+  requestIp  String?   @map("request_ip")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([phone])
+  @@map("otp_codes")
+}
+
+model Notification {
+  id          String              @id @default(uuid()) @db.Uuid
+  clinicId    String?             @map("clinic_id") @db.Uuid
+  channel     NotificationChannel
+  recipient   String
+  template    String
+  payload     Json
+  scheduledAt DateTime            @map("scheduled_at")
+  sentAt      DateTime?           @map("sent_at")
+  status      NotificationStatus  @default(SCHEDULED)
+  providerRef String?             @map("provider_ref")
+  clinic      Clinic?             @relation(fields: [clinicId], references: [id])
+
+  @@map("notifications")
+}
