@@ -1,0 +1,19 @@
+CREATE ROLE dentbook_app LOGIN PASSWORD 'app_pw';
+GRANT CONNECT ON DATABASE dentbook TO dentbook_app;
+
+CREATE DATABASE dentbook_test;
+GRANT CONNECT ON DATABASE dentbook_test TO dentbook_app;
+
+\connect dentbook
+GRANT USAGE ON SCHEMA public TO dentbook_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO dentbook_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  GRANT USAGE ON SEQUENCES TO dentbook_app;
+
+\connect dentbook_test
+GRANT USAGE ON SCHEMA public TO dentbook_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO dentbook_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  GRANT USAGE ON SEQUENCES TO dentbook_app;
