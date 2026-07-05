@@ -6,11 +6,31 @@
 
 **Architecture:** Single Next.js (App Router) monolith talking to PostgreSQL through Prisma. The app connects as a non-superuser role (`dentbook_app`) subject to RLS; every query runs inside a transaction that sets `app.user_id` / `app.clinic_id` / `app.role` session variables which the RLS policies read. Migrations run as superuser via `DIRECT_DATABASE_URL`.
 
-**Tech Stack:** Next.js 15 (App Router, TS), Prisma 6, PostgreSQL 16 (Docker), Auth.js (next-auth v5), next-intl, Zod, bcryptjs, Vitest.
+**Tech Stack:** Next.js 16 (App Router, TS), Prisma 7, PostgreSQL 17, Auth.js (next-auth v5), next-intl, Zod, bcryptjs, Vitest.
 
 **Plan sequence:** This is Plan 1 of 5 (Foundation → Dashboard → Booking → Monetization/Admin → Subdomains/E2E/Prod). Later plans are written after this one ships.
 
 **Spec:** `docs/superpowers/specs/2026-07-05-dentbook-design.md`
+
+---
+
+## Deviations discovered during execution
+
+1. **No Docker on this machine** (no Docker Desktop, no WSL). Instead, a
+   project-local PostgreSQL 17 instance lives in `.pgdata/` (gitignored) on
+   **port 5433**, using the already-installed PostgreSQL 17 binaries.
+   `npm run db:start` / `db:stop` manage it. `docker-compose.yml` is kept
+   for machines that do have Docker. `docker/postgres-init.sql` was applied
+   manually via psql.
+2. **Next.js 16** (not 15): `middleware.ts` → `proxy.ts` with exported
+   `proxy` function; `next lint` removed; Turbopack default.
+3. **Prisma 7** (not 6): requires `prisma.config.ts` (CLI reads DB URL and
+   seed command from it; .env NOT auto-loaded — dotenv imported in config);
+   generator is `prisma-client` with explicit `output` (generated into
+   `src/generated/prisma/`, imported from there, not `@prisma/client`);
+   `PrismaClient` requires a driver adapter (`@prisma/adapter-pg`);
+   schema datasource has no `url`/`directUrl` — migrations connect via
+   `prisma.config.ts` using `DIRECT_DATABASE_URL`.
 
 ---
 
@@ -56,6 +76,7 @@ dentbook/
 ### Task 1: Scaffold app, tooling, and dev database
 
 **Files:**
+
 - Create: entire Next.js scaffold (via CLI), `docker-compose.yml`, `docker/postgres-init.sql`, `.env`, `.env.example`, `vitest.config.ts`
 - Modify: `package.json` (scripts), `.gitignore`
 
@@ -206,6 +227,7 @@ git commit -m "chore: scaffold Next.js app, Docker Postgres, test tooling"
 ### Task 2: Prisma schema (all core models) + init migration
 
 **Files:**
+
 - Create: `prisma/schema.prisma`, `src/lib/db.ts`
 - Migration: `prisma/migrations/<ts>_init/`
 
@@ -528,8 +550,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 /** RLS-enforced app connection. All request-path code uses this. */
-export const prisma =
-  globalForPrisma.prisma ?? new PrismaClient();
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
 /** Superuser connection. ONLY for migrations-adjacent tooling, seeds, tests. */
 export const prismaDirect =
@@ -562,6 +583,7 @@ git commit -m "feat: add Prisma schema for all core entities and init migration"
 ### Task 3: RLS policies, helper functions, and booking exclusion constraint
 
 **Files:**
+
 - Migration: `prisma/migrations/<ts>_rls/migration.sql` (hand-written)
 
 - [ ] **Step 1: Create an empty migration**
@@ -796,6 +818,7 @@ git commit -m "feat: add RLS policies, session helpers, and double-booking exclu
 ### Task 4: Tenant context helper + RLS isolation proof tests
 
 **Files:**
+
 - Create: `src/lib/tenant-db.ts`, `tests/helpers/global-setup.ts`, `tests/helpers/setup-env.ts`, `tests/helpers/db.ts`, `tests/rls-isolation.test.ts`
 
 - [ ] **Step 1: Create `src/lib/tenant-db.ts`**
@@ -818,7 +841,7 @@ export interface DbContext {
  */
 export async function withDbContext<T>(
   ctx: DbContext,
-  fn: (tx: Prisma.TransactionClient) => Promise<T>,
+  fn: (tx: Prisma.TransactionClient) => Promise<T>
 ): Promise<T> {
   return prisma.$transaction(async (tx) => {
     await tx.$executeRaw`
@@ -879,7 +902,7 @@ export type AppRole = "public" | "patient" | "staff" | "admin" | "auth";
 /** Test twin of withDbContext, bound to the test app client. */
 export async function asContext<T>(
   ctx: { role: AppRole; userId?: string; clinicId?: string },
-  fn: (tx: Prisma.TransactionClient) => Promise<T>,
+  fn: (tx: Prisma.TransactionClient) => Promise<T>
 ): Promise<T> {
   return app.$transaction(async (tx) => {
     await tx.$executeRaw`
@@ -914,14 +937,27 @@ let dentistMembershipA: string;
 beforeAll(async () => {
   await truncateAll();
   const a = await direct.clinic.create({
-    data: { slug: "klinika-a", name: "Klinika A", city: "Prishtinë",
-            address: "Rr. A 1", phone: "+38344111111", published: true },
+    data: {
+      slug: "klinika-a",
+      name: "Klinika A",
+      city: "Prishtinë",
+      address: "Rr. A 1",
+      phone: "+38344111111",
+      published: true,
+    },
   });
   const b = await direct.clinic.create({
-    data: { slug: "klinika-b", name: "Klinika B", city: "Prizren",
-            address: "Rr. B 2", phone: "+38344222222", published: false },
+    data: {
+      slug: "klinika-b",
+      name: "Klinika B",
+      city: "Prizren",
+      address: "Rr. B 2",
+      phone: "+38344222222",
+      published: false,
+    },
   });
-  clinicA = a.id; clinicB = b.id;
+  clinicA = a.id;
+  clinicB = b.id;
 
   const ua = await direct.user.create({
     data: { name: "Staff A", email: "staff@a.com", passwordHash: "x" },
@@ -932,23 +968,37 @@ beforeAll(async () => {
   });
 
   // one dentist per clinic (separate users — user+clinic is unique)
-  const drA = await direct.user.create({ data: { name: "Dr A", email: "dr@a.com" } });
+  const drA = await direct.user.create({
+    data: { name: "Dr A", email: "dr@a.com" },
+  });
   const mA = await direct.membership.create({
     data: { userId: drA.id, clinicId: clinicA, role: "DENTIST" },
   });
   dentistMembershipA = mA.id;
-  const drB = await direct.user.create({ data: { name: "Dr B", email: "dr@b.com" } });
+  const drB = await direct.user.create({
+    data: { name: "Dr B", email: "dr@b.com" },
+  });
   const mB = await direct.membership.create({
     data: { userId: drB.id, clinicId: clinicB, role: "DENTIST" },
   });
 
   const svcA = await direct.service.create({
-    data: { clinicId: clinicA, nameSq: "Pastrim", nameEn: "Cleaning",
-            durationMin: 30, priceEur: 25 },
+    data: {
+      clinicId: clinicA,
+      nameSq: "Pastrim",
+      nameEn: "Cleaning",
+      durationMin: 30,
+      priceEur: 25,
+    },
   });
   const svcB = await direct.service.create({
-    data: { clinicId: clinicB, nameSq: "Kontroll", nameEn: "Check-up",
-            durationMin: 30, priceEur: 20 },
+    data: {
+      clinicId: clinicB,
+      nameSq: "Kontroll",
+      nameEn: "Check-up",
+      durationMin: 30,
+      priceEur: 20,
+    },
   });
 
   const px = await direct.user.create({
@@ -958,16 +1008,26 @@ beforeAll(async () => {
 
   // the same patient has one appointment in EACH clinic
   await direct.appointment.create({
-    data: { clinicId: clinicA, membershipId: mA.id,
-            patientUserId: patientX, serviceId: svcA.id,
-            startsAt: new Date("2026-08-01T09:00:00Z"),
-            endsAt: new Date("2026-08-01T09:30:00Z"), status: "CONFIRMED" },
+    data: {
+      clinicId: clinicA,
+      membershipId: mA.id,
+      patientUserId: patientX,
+      serviceId: svcA.id,
+      startsAt: new Date("2026-08-01T09:00:00Z"),
+      endsAt: new Date("2026-08-01T09:30:00Z"),
+      status: "CONFIRMED",
+    },
   });
   await direct.appointment.create({
-    data: { clinicId: clinicB, membershipId: mB.id,
-            patientUserId: patientX, serviceId: svcB.id,
-            startsAt: new Date("2026-08-02T10:00:00Z"),
-            endsAt: new Date("2026-08-02T10:30:00Z"), status: "CONFIRMED" },
+    data: {
+      clinicId: clinicB,
+      membershipId: mB.id,
+      patientUserId: patientX,
+      serviceId: svcB.id,
+      startsAt: new Date("2026-08-02T10:00:00Z"),
+      endsAt: new Date("2026-08-02T10:30:00Z"),
+      status: "CONFIRMED",
+    },
   });
 });
 
@@ -980,7 +1040,7 @@ describe("RLS tenant isolation", () => {
   it("staff of clinic A cannot read clinic B (unpublished)", async () => {
     const rows = await asContext(
       { role: "staff", userId: staffA, clinicId: clinicA },
-      (tx) => tx.clinic.findMany(),
+      (tx) => tx.clinic.findMany()
     );
     expect(rows.map((c) => c.id)).toContain(clinicA);
     expect(rows.map((c) => c.id)).not.toContain(clinicB);
@@ -989,8 +1049,11 @@ describe("RLS tenant isolation", () => {
   it("staff of clinic A cannot update clinic B", async () => {
     const res = await asContext(
       { role: "staff", userId: staffA, clinicId: clinicA },
-      (tx) => tx.clinic.updateMany({
-        where: { id: clinicB }, data: { name: "HACKED" } }),
+      (tx) =>
+        tx.clinic.updateMany({
+          where: { id: clinicB },
+          data: { name: "HACKED" },
+        })
     );
     expect(res.count).toBe(0);
     const b = await direct.clinic.findUnique({ where: { id: clinicB } });
@@ -1000,37 +1063,41 @@ describe("RLS tenant isolation", () => {
   it("staff of clinic A sees only their clinic's appointments (1 of 2)", async () => {
     const rows = await asContext(
       { role: "staff", userId: staffA, clinicId: clinicA },
-      (tx) => tx.appointment.findMany(),
+      (tx) => tx.appointment.findMany()
     );
     expect(rows.length).toBe(1);
     expect(rows[0].clinicId).toBe(clinicA);
   });
 
   it("anonymous (public) sees only published clinics", async () => {
-    const rows = await asContext({ role: "public" }, (tx) => tx.clinic.findMany());
+    const rows = await asContext({ role: "public" }, (tx) =>
+      tx.clinic.findMany()
+    );
     expect(rows.map((c) => c.id)).toEqual([clinicA]);
   });
 
   it("public cannot read appointments at all", async () => {
-    const rows = await asContext({ role: "public" }, (tx) => tx.appointment.findMany());
+    const rows = await asContext({ role: "public" }, (tx) =>
+      tx.appointment.findMany()
+    );
     expect(rows).toEqual([]);
   });
 
   it("patient sees own appointments across clinics but not other users", async () => {
-    const appts = await asContext(
-      { role: "patient", userId: patientX },
-      (tx) => tx.appointment.findMany(),
+    const appts = await asContext({ role: "patient", userId: patientX }, (tx) =>
+      tx.appointment.findMany()
     );
     expect(appts.length).toBe(2);
-    const users = await asContext(
-      { role: "patient", userId: patientX },
-      (tx) => tx.user.findMany(),
+    const users = await asContext({ role: "patient", userId: patientX }, (tx) =>
+      tx.user.findMany()
     );
     expect(users.map((u) => u.id)).toEqual([patientX]);
   });
 
   it("admin sees everything", async () => {
-    const rows = await asContext({ role: "admin" }, (tx) => tx.clinic.findMany());
+    const rows = await asContext({ role: "admin" }, (tx) =>
+      tx.clinic.findMany()
+    );
     expect(rows.length).toBe(2);
   });
 
@@ -1041,12 +1108,15 @@ describe("RLS tenant isolation", () => {
     await expect(
       direct.appointment.create({
         data: {
-          clinicId: appt.clinicId, membershipId: dentistMembershipA,
-          patientUserId: patientX, serviceId: appt.serviceId,
+          clinicId: appt.clinicId,
+          membershipId: dentistMembershipA,
+          patientUserId: patientX,
+          serviceId: appt.serviceId,
           startsAt: new Date("2026-08-01T09:15:00Z"), // overlaps 09:00–09:30
-          endsAt: new Date("2026-08-01T09:45:00Z"), status: "CONFIRMED",
+          endsAt: new Date("2026-08-01T09:45:00Z"),
+          status: "CONFIRMED",
         },
-      }),
+      })
     ).rejects.toThrow();
   });
 });
@@ -1072,6 +1142,7 @@ git commit -m "feat: tenant context helper and RLS isolation proof tests"
 ### Task 5: OTP service with rate limiting + SMS provider abstraction
 
 **Files:**
+
 - Create: `src/lib/sms/types.ts`, `src/lib/sms/console.ts`, `src/lib/sms/index.ts`, `src/lib/otp.ts`, `tests/otp.test.ts`
 
 - [ ] **Step 1: Create the SMS provider interface — `src/lib/sms/types.ts`**
@@ -1134,7 +1205,9 @@ describe("requestOtp", () => {
   it("stores a hashed 6-digit code and returns nothing sensitive", async () => {
     const res = await requestOtp(PHONE, "1.2.3.4");
     expect(res).toEqual({ ok: true });
-    const row = await direct.otpCode.findFirstOrThrow({ where: { phone: PHONE } });
+    const row = await direct.otpCode.findFirstOrThrow({
+      where: { phone: PHONE },
+    });
     expect(row.codeHash).toMatch(/^[a-f0-9]{64}$/); // sha256 hex, never plaintext
     expect(row.expiresAt.getTime()).toBeGreaterThan(Date.now());
   });
@@ -1150,7 +1223,9 @@ describe("requestOtp", () => {
     for (let i = 0; i < 10; i++) {
       await requestOtp(`+3834400000${i}`, "9.9.9.9");
     }
-    await expect(requestOtp("+38344999998", "9.9.9.9")).rejects.toThrow(OtpError);
+    await expect(requestOtp("+38344999998", "9.9.9.9")).rejects.toThrow(
+      OtpError
+    );
   });
 });
 
@@ -1195,7 +1270,9 @@ describe("verifyOtp", () => {
 async function requestOtpReturningCode(phone: string): Promise<string> {
   const spy = vi.spyOn(console, "log");
   await requestOtp(phone, "1.2.3.4");
-  const line = spy.mock.calls.map((c) => String(c[0])).find((l) => l.includes(phone));
+  const line = spy.mock.calls
+    .map((c) => String(c[0]))
+    .find((l) => l.includes(phone));
   spy.mockRestore();
   const m = line?.match(/\b(\d{6})\b/);
   if (!m) throw new Error("no OTP code logged");
@@ -1224,9 +1301,14 @@ const MAX_PER_IP_HOUR = 10;
 const MAX_VERIFY_ATTEMPTS = 5;
 
 export class OtpError extends Error {
-  constructor(public code:
-    | "RATE_LIMITED_PHONE" | "RATE_LIMITED_IP"
-    | "INVALID_CODE" | "EXPIRED" | "TOO_MANY_ATTEMPTS") {
+  constructor(
+    public code:
+      | "RATE_LIMITED_PHONE"
+      | "RATE_LIMITED_IP"
+      | "INVALID_CODE"
+      | "EXPIRED"
+      | "TOO_MANY_ATTEMPTS"
+  ) {
     super(code);
   }
 }
@@ -1237,16 +1319,22 @@ function hashCode(phone: string, code: string): string {
     .digest("hex");
 }
 
-export async function requestOtp(phone: string, ip: string): Promise<{ ok: true }> {
+export async function requestOtp(
+  phone: string,
+  ip: string
+): Promise<{ ok: true }> {
   const code = randomInt(0, 1_000_000).toString().padStart(6, "0");
   await withDbContext({ role: "auth" }, async (tx) => {
     const since15 = new Date(Date.now() - 15 * 60 * 1000);
     const sinceHour = new Date(Date.now() - 60 * 60 * 1000);
     const [byPhone, byIp] = await Promise.all([
       tx.otpCode.count({ where: { phone, createdAt: { gte: since15 } } }),
-      tx.otpCode.count({ where: { requestIp: ip, createdAt: { gte: sinceHour } } }),
+      tx.otpCode.count({
+        where: { requestIp: ip, createdAt: { gte: sinceHour } },
+      }),
     ]);
-    if (byPhone >= MAX_PER_PHONE_15MIN) throw new OtpError("RATE_LIMITED_PHONE");
+    if (byPhone >= MAX_PER_PHONE_15MIN)
+      throw new OtpError("RATE_LIMITED_PHONE");
     if (byIp >= MAX_PER_IP_HOUR) throw new OtpError("RATE_LIMITED_IP");
     await tx.otpCode.create({
       data: {
@@ -1268,16 +1356,19 @@ export async function verifyOtp(phone: string, code: string, name: string) {
       orderBy: { createdAt: "desc" },
     });
     if (!otp) throw new OtpError("INVALID_CODE");
-    if (otp.attempts >= MAX_VERIFY_ATTEMPTS) throw new OtpError("TOO_MANY_ATTEMPTS");
+    if (otp.attempts >= MAX_VERIFY_ATTEMPTS)
+      throw new OtpError("TOO_MANY_ATTEMPTS");
     if (otp.expiresAt < new Date()) throw new OtpError("EXPIRED");
     if (otp.codeHash !== hashCode(phone, code)) {
       await tx.otpCode.update({
-        where: { id: otp.id }, data: { attempts: { increment: 1 } },
+        where: { id: otp.id },
+        data: { attempts: { increment: 1 } },
       });
       throw new OtpError("INVALID_CODE");
     }
     await tx.otpCode.update({
-      where: { id: otp.id }, data: { consumedAt: new Date() },
+      where: { id: otp.id },
+      data: { consumedAt: new Date() },
     });
     const existing = await tx.user.findUnique({ where: { phone } });
     if (existing) return existing;
@@ -1306,7 +1397,8 @@ git commit -m "feat: phone OTP service with rate limiting and SMS provider abstr
 ### Task 6: Staff password auth + Auth.js wiring
 
 **Files:**
-- Create: `src/lib/staff-auth.ts`, `tests/staff-auth.test.ts`, `src/auth.ts`, `src/app/api/auth/[...nextauth]/route.ts`, `src/types/next-auth.d.ts` (the login *page* is built in Task 7 after i18n exists)
+
+- Create: `src/lib/staff-auth.ts`, `tests/staff-auth.test.ts`, `src/auth.ts`, `src/app/api/auth/[...nextauth]/route.ts`, `src/types/next-auth.d.ts` (the login _page_ is built in Task 7 after i18n exists)
 
 - [ ] **Step 1: Write failing tests — `tests/staff-auth.test.ts`**
 
@@ -1326,8 +1418,11 @@ afterAll(async () => {
 describe("staff login", () => {
   it("returns the user for correct email+password", async () => {
     await direct.user.create({
-      data: { name: "Owner", email: "owner@klinika.com",
-              passwordHash: await hashPassword("sekret123") },
+      data: {
+        name: "Owner",
+        email: "owner@klinika.com",
+        passwordHash: await hashPassword("sekret123"),
+      },
     });
     const user = await verifyStaffLogin("owner@klinika.com", "sekret123");
     expect(user?.email).toBe("owner@klinika.com");
@@ -1335,8 +1430,11 @@ describe("staff login", () => {
 
   it("returns null for wrong password", async () => {
     await direct.user.create({
-      data: { name: "Owner", email: "owner@klinika.com",
-              passwordHash: await hashPassword("sekret123") },
+      data: {
+        name: "Owner",
+        email: "owner@klinika.com",
+        passwordHash: await hashPassword("sekret123"),
+      },
     });
     expect(await verifyStaffLogin("owner@klinika.com", "gabim")).toBeNull();
   });
@@ -1403,17 +1501,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       id: "patient-otp",
       credentials: { phone: {}, code: {}, name: {} },
       async authorize(creds) {
-        const parsed = z.object({
-          phone: z.string().min(8),
-          code: z.string().length(6),
-          name: z.string().min(1),
-        }).safeParse(creds);
+        const parsed = z
+          .object({
+            phone: z.string().min(8),
+            code: z.string().length(6),
+            name: z.string().min(1),
+          })
+          .safeParse(creds);
         if (!parsed.success) return null;
         try {
           const user = await verifyOtp(
-            parsed.data.phone, parsed.data.code, parsed.data.name);
-          return { id: user.id, name: user.name,
-                   isPlatformAdmin: user.isPlatformAdmin, kind: "patient" };
+            parsed.data.phone,
+            parsed.data.code,
+            parsed.data.name
+          );
+          return {
+            id: user.id,
+            name: user.name,
+            isPlatformAdmin: user.isPlatformAdmin,
+            kind: "patient",
+          };
         } catch {
           return null;
         }
@@ -1423,16 +1530,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       id: "staff-login",
       credentials: { email: {}, password: {} },
       async authorize(creds) {
-        const parsed = z.object({
-          email: z.string().email(),
-          password: z.string().min(1),
-        }).safeParse(creds);
+        const parsed = z
+          .object({
+            email: z.string().email(),
+            password: z.string().min(1),
+          })
+          .safeParse(creds);
         if (!parsed.success) return null;
         const user = await verifyStaffLogin(
-          parsed.data.email, parsed.data.password);
+          parsed.data.email,
+          parsed.data.password
+        );
         if (!user) return null;
-        return { id: user.id, name: user.name, email: user.email,
-                 isPlatformAdmin: user.isPlatformAdmin, kind: "staff" };
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          isPlatformAdmin: user.isPlatformAdmin,
+          kind: "staff",
+        };
       },
     }),
   ],
@@ -1441,8 +1557,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.userId = user.id;
         token.kind = (user as { kind: string }).kind;
-        token.isPlatformAdmin =
-          (user as { isPlatformAdmin: boolean }).isPlatformAdmin;
+        token.isPlatformAdmin = (
+          user as { isPlatformAdmin: boolean }
+        ).isPlatformAdmin;
       }
       return token;
     },
@@ -1502,6 +1619,7 @@ git commit -m "feat: staff password auth and Auth.js wiring with patient OTP + s
 ### Task 7: i18n (next-intl) — Albanian default, English secondary + minimal shell UI
 
 **Files:**
+
 - Create: `src/i18n/routing.ts`, `src/i18n/request.ts`, `src/middleware.ts`, `src/messages/sq.json`, `src/messages/en.json`, `src/app/[locale]/layout.tsx`, `src/app/[locale]/page.tsx`, `src/app/[locale]/login/page.tsx`
 - Modify: `next.config.ts` (next-intl plugin)
 - Delete: `src/app/page.tsx`, `src/app/layout.tsx` (replaced by `[locale]` tree; keep `globals.css` import in the new layout)
@@ -1688,10 +1806,20 @@ export default async function LoginPage() {
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 p-8">
       <h1 className="text-2xl font-bold">{t("staffTitle")}</h1>
       <form action={loginAction} className="flex flex-col gap-3">
-        <input name="email" type="email" required placeholder={t("email")}
-               className="rounded border p-2" />
-        <input name="password" type="password" required placeholder={t("password")}
-               className="rounded border p-2" />
+        <input
+          name="email"
+          type="email"
+          required
+          placeholder={t("email")}
+          className="rounded border p-2"
+        />
+        <input
+          name="password"
+          type="password"
+          required
+          placeholder={t("password")}
+          className="rounded border p-2"
+        />
         <button type="submit" className="rounded bg-sky-600 p-2 text-white">
           {t("submit")}
         </button>
@@ -1721,6 +1849,7 @@ git commit -m "feat: Albanian/English i18n with next-intl, localized home and st
 ### Task 8: Seed script + final verification
 
 **Files:**
+
 - Create: `prisma/seed.ts`
 
 - [ ] **Step 1: Write `prisma/seed.ts`** (uses the direct client — seeding bypasses RLS)
@@ -1738,41 +1867,83 @@ async function main() {
   await db.user.upsert({
     where: { email: "admin@dentbook.dev" },
     update: {},
-    create: { name: "Platform Admin", email: "admin@dentbook.dev",
-              passwordHash: pw, isPlatformAdmin: true },
+    create: {
+      name: "Platform Admin",
+      email: "admin@dentbook.dev",
+      passwordHash: pw,
+      isPlatformAdmin: true,
+    },
   });
 
   const clinics = [
-    { slug: "klinika-arta", name: "Klinika Dentare Arta", city: "Prishtinë",
-      address: "Rr. Nëna Terezë 12", phone: "+38344100100", published: true,
+    {
+      slug: "klinika-arta",
+      name: "Klinika Dentare Arta",
+      city: "Prishtinë",
+      address: "Rr. Nëna Terezë 12",
+      phone: "+38344100100",
+      published: true,
       owner: { name: "Arta Berisha", email: "arta@klinika-arta.dev" },
-      dentists: [{ name: "Dr. Blerim Gashi", email: "blerim@klinika-arta.dev",
-                   title: "Dr. med. dent." }] },
-    { slug: "dental-prizren", name: "Dental Center Prizren", city: "Prizren",
-      address: "Rr. Adem Jashari 5", phone: "+38344200200", published: true,
+      dentists: [
+        {
+          name: "Dr. Blerim Gashi",
+          email: "blerim@klinika-arta.dev",
+          title: "Dr. med. dent.",
+        },
+      ],
+    },
+    {
+      slug: "dental-prizren",
+      name: "Dental Center Prizren",
+      city: "Prizren",
+      address: "Rr. Adem Jashari 5",
+      phone: "+38344200200",
+      published: true,
       owner: { name: "Fatos Krasniqi", email: "fatos@dental-prizren.dev" },
-      dentists: [{ name: "Dr. Vjosa Hoti", email: "vjosa@dental-prizren.dev",
-                   title: "Dr. med. dent." }] },
-    { slug: "smile-peja", name: "Smile Clinic Peja", city: "Pejë",
-      address: "Rr. Haxhi Zeka 3", phone: "+38344300300", published: false,
+      dentists: [
+        {
+          name: "Dr. Vjosa Hoti",
+          email: "vjosa@dental-prizren.dev",
+          title: "Dr. med. dent.",
+        },
+      ],
+    },
+    {
+      slug: "smile-peja",
+      name: "Smile Clinic Peja",
+      city: "Pejë",
+      address: "Rr. Haxhi Zeka 3",
+      phone: "+38344300300",
+      published: false,
       owner: { name: "Erza Morina", email: "erza@smile-peja.dev" },
-      dentists: [] },
+      dentists: [],
+    },
   ];
 
   for (const c of clinics) {
     const clinic = await db.clinic.upsert({
       where: { slug: c.slug },
       update: {},
-      create: { slug: c.slug, name: c.name, city: c.city, address: c.address,
-                phone: c.phone, published: c.published,
-                approvedAt: c.published ? new Date() : null },
+      create: {
+        slug: c.slug,
+        name: c.name,
+        city: c.city,
+        address: c.address,
+        phone: c.phone,
+        published: c.published,
+        approvedAt: c.published ? new Date() : null,
+      },
     });
 
     await db.subscription.upsert({
       where: { clinicId: clinic.id },
       update: {},
-      create: { clinicId: clinic.id, plan: "TRIAL", status: "ACTIVE",
-                trialEndsAt: new Date(Date.now() + 30 * 24 * 3600 * 1000) },
+      create: {
+        clinicId: clinic.id,
+        plan: "TRIAL",
+        status: "ACTIVE",
+        trialEndsAt: new Date(Date.now() + 30 * 24 * 3600 * 1000),
+      },
     });
 
     const owner = await db.user.upsert({
@@ -1788,15 +1959,33 @@ async function main() {
 
     const services = await Promise.all([
       db.service.create({
-        data: { clinicId: clinic.id, nameSq: "Kontroll dhe konsultë",
-                nameEn: "Check-up & consultation", durationMin: 30, priceEur: 20 } }),
+        data: {
+          clinicId: clinic.id,
+          nameSq: "Kontroll dhe konsultë",
+          nameEn: "Check-up & consultation",
+          durationMin: 30,
+          priceEur: 20,
+        },
+      }),
       db.service.create({
-        data: { clinicId: clinic.id, nameSq: "Pastrim dhëmbësh",
-                nameEn: "Teeth cleaning", durationMin: 45, priceEur: 35 } }),
+        data: {
+          clinicId: clinic.id,
+          nameSq: "Pastrim dhëmbësh",
+          nameEn: "Teeth cleaning",
+          durationMin: 45,
+          priceEur: 35,
+        },
+      }),
       db.service.create({
-        data: { clinicId: clinic.id, nameSq: "Mbushje dhëmbi",
-                nameEn: "Tooth filling", durationMin: 60, priceEur: 40,
-                depositEur: 10 } }),
+        data: {
+          clinicId: clinic.id,
+          nameSq: "Mbushje dhëmbi",
+          nameEn: "Tooth filling",
+          durationMin: 60,
+          priceEur: 40,
+          depositEur: 10,
+        },
+      }),
     ]);
 
     for (const d of c.dentists) {
@@ -1808,12 +1997,18 @@ async function main() {
       const m = await db.membership.upsert({
         where: { userId_clinicId: { userId: du.id, clinicId: clinic.id } },
         update: {},
-        create: { userId: du.id, clinicId: clinic.id, role: "DENTIST",
-                  title: d.title },
+        create: {
+          userId: du.id,
+          clinicId: clinic.id,
+          role: "DENTIST",
+          title: d.title,
+        },
       });
       for (const s of services) {
         await db.dentistService.upsert({
-          where: { membershipId_serviceId: { membershipId: m.id, serviceId: s.id } },
+          where: {
+            membershipId_serviceId: { membershipId: m.id, serviceId: s.id },
+          },
           update: {},
           create: { membershipId: m.id, serviceId: s.id },
         });
@@ -1821,7 +2016,12 @@ async function main() {
       // Mon–Fri 09:00–17:00
       for (const weekday of [1, 2, 3, 4, 5]) {
         await db.schedule.create({
-          data: { membershipId: m.id, weekday, startMin: 9 * 60, endMin: 17 * 60 },
+          data: {
+            membershipId: m.id,
+            weekday,
+            startMin: 9 * 60,
+            endMin: 17 * 60,
+          },
         });
       }
     }
@@ -1832,7 +2032,11 @@ async function main() {
 
 main()
   .then(() => db.$disconnect())
-  .catch(async (e) => { console.error(e); await db.$disconnect(); process.exit(1); });
+  .catch(async (e) => {
+    console.error(e);
+    await db.$disconnect();
+    process.exit(1);
+  });
 ```
 
 Note: seed uses `create` (not upsert) for services/schedules, so it is idempotent only for users/clinics/memberships. Acceptable for dev; re-running against a dirty DB duplicates services. Reset with `npx prisma migrate reset` when needed.
