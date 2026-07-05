@@ -1,0 +1,17 @@
+{
+  "Home": {
+    "title": "Gjej dentistin tënd në Kosovë",
+    "subtitle": "Krahaso klinikat, shiko oraret e lira dhe rezervo online.",
+    "cta": "Kërko klinika"
+  },
+  "Login": {
+    "staffTitle": "Hyrja për klinika",
+    "email": "Email",
+    "password": "Fjalëkalimi",
+    "submit": "Hyr",
+    "error": "Email ose fjalëkalim i gabuar"
+  },
+  "Common": {
+    "appName": "Dentbook"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "Home": {
+    "title": "Find your dentist in Kosovo",
+    "subtitle": "Compare clinics, see open slots, and book online.",
+    "cta": "Browse clinics"
+  },
+  "Login": {
+    "staffTitle": "Clinic sign-in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "error": "Wrong email or password"
+  },
+  "Common": {
+    "appName": "Dentbook"
+  }
+}
