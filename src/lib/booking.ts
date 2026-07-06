@@ -1,0 +1,73 @@
+import { z } from "zod";
+import { withDbContext } from "./tenant-db";
+import { getAvailableSlots } from "./availability";
+
+export class BookingError extends Error {
+  constructor(public code: "INVALID_INPUT" | "NOT_FOUND" | "SLOT_TAKEN") { super(code); }
+}
+
+const schema = z.object({
+  clinicSlug: z.string().min(1),
+  serviceId: z.string().uuid(),
+  membershipId: z.string().uuid(),
+  patientUserId: z.string().uuid(),
+  startsAtISO: z.string(),
+});
+export type BookingInput = z.infer<typeof schema>;
+
+/** The clinic-local calendar day an instant falls on (en-CA = YYYY-MM-DD). */
+export function clinicLocalDateISO(instant: Date, timezone: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(instant);
+}
+
+/** Postgres exclusion constraint no_double_booking → SLOT_TAKEN. */
+export function isExclusionViolation(e: unknown): boolean {
+  const seen = new Set<unknown>();
+  let cur: unknown = e;
+  while (cur && typeof cur === "object" && !seen.has(cur)) {
+    seen.add(cur);
+    const msg = (cur as { message?: unknown }).message;
+    if (typeof msg === "string" && msg.includes("no_double_booking")) return true;
+    cur = (cur as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
+export async function createBooking(input: BookingInput) {
+  const parsed = schema.safeParse(input);
+  if (!parsed.success) throw new BookingError("INVALID_INPUT");
+  const d = parsed.data;
+  const startsAt = new Date(d.startsAtISO);
+  if (Number.isNaN(startsAt.getTime())) throw new BookingError("INVALID_INPUT");
+
+  const clinic = await withDbContext({ role: "auth" }, (tx) =>
+    tx.clinic.findUnique({ where: { slug: d.clinicSlug } }));
+  if (!clinic?.published) throw new BookingError("NOT_FOUND");
+
+  const dateISO = clinicLocalDateISO(startsAt, clinic.timezone);
+  const slots = await getAvailableSlots({
+    clinicSlug: d.clinicSlug, serviceId: d.serviceId,
+    membershipId: d.membershipId, dateISO });
+  const slot = slots.find((s) => s.startsAt.getTime() === startsAt.getTime());
+  if (!slot) throw new BookingError("SLOT_TAKEN");
+
+  try {
+    const appt = await withDbContext(
+      { role: "auth", userId: d.patientUserId },
+      (tx) => tx.appointment.create({
+        data: {
+          clinicId: clinic.id, membershipId: d.membershipId,
+          patientUserId: d.patientUserId, serviceId: d.serviceId,
+          startsAt: slot.startsAt, endsAt: slot.endsAt,
+          status: clinic.bookingMode === "INSTANT" ? "CONFIRMED" : "PENDING",
+        },
+      }));
+    return { appointmentId: appt.id, manageToken: appt.manageToken,
+             status: appt.status as "PENDING" | "CONFIRMED" };
+  } catch (e) {
+    if (isExclusionViolation(e)) throw new BookingError("SLOT_TAKEN");
+    throw e;
+  }
+}
