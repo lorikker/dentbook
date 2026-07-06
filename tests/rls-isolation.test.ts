@@ -4,6 +4,7 @@ import { direct, app, asContext, truncateAll } from "./helpers/db";
 let clinicA: string, clinicB: string;
 let staffA: string, patientX: string;
 let dentistMembershipA: string;
+let dentistUserA: string, dentistUserB: string;
 
 beforeAll(async () => {
   await truncateAll();
@@ -27,11 +28,13 @@ beforeAll(async () => {
 
   // one dentist per clinic (separate users — user+clinic is unique)
   const drA = await direct.user.create({ data: { name: "Dr A", email: "dr@a.com" } });
+  dentistUserA = drA.id;
   const mA = await direct.membership.create({
     data: { userId: drA.id, clinicId: clinicA, role: "DENTIST" },
   });
   dentistMembershipA = mA.id;
   const drB = await direct.user.create({ data: { name: "Dr B", email: "dr@b.com" } });
+  dentistUserB = drB.id;
   const mB = await direct.membership.create({
     data: { userId: drB.id, clinicId: clinicB, role: "DENTIST" },
   });
@@ -110,7 +113,7 @@ describe("RLS tenant isolation", () => {
     expect(rows).toEqual([]);
   });
 
-  it("patient sees own appointments across clinics but not other users", async () => {
+  it("patient sees own appointments across clinics; user visibility is self + published-clinic dentists only", async () => {
     const appts = await asContext(
       { role: "patient", userId: patientX },
       (tx) => tx.appointment.findMany(),
@@ -120,7 +123,11 @@ describe("RLS tenant isolation", () => {
       { role: "patient", userId: patientX },
       (tx) => tx.user.findMany(),
     );
-    expect(users.map((u) => u.id)).toEqual([patientX]);
+    const ids = users.map((u) => u.id);
+    // dentists of PUBLISHED clinics are public marketplace profiles
+    expect(new Set(ids)).toEqual(new Set([patientX, dentistUserA]));
+    expect(ids).not.toContain(staffA);        // non-dentist staff stay hidden
+    expect(ids).not.toContain(dentistUserB);  // unpublished clinic stays hidden
   });
 
   it("admin sees everything", async () => {
