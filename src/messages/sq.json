@@ -80,6 +80,14 @@
       "save": "Ruaj"
     }
   },
+  "Clinics": {
+    "title": "Klinikat",
+    "allCities": "Të gjitha qytetet",
+    "empty": "Nuk u gjet asnjë klinikë",
+    "dentists": "Dentistët",
+    "services": "Shërbimet",
+    "book": "Rezervo"
+  },
   "Common": {
     "appName": "Dentbook"
   }
