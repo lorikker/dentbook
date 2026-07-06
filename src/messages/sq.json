@@ -50,6 +50,20 @@
       "roles": { "DENTIST": "Dentist", "RECEPTIONIST": "Recepsionist", "OWNER": "Pronar" },
       "addTitle": "Shto anëtar stafi",
       "add": "Shto"
+    },
+    "schedules": {
+      "title": "Oraret",
+      "noSchedule": "Pa orar të caktuar",
+      "setTitle": "Cakto orarin javor",
+      "entriesPlaceholder": "1,09:00,17:00\n2,09:00,17:00",
+      "entriesHint": "Një rresht për interval: dita (0=E diel .. 6=E shtunë), fillimi, mbarimi. Zëvendëson orarin ekzistues.",
+      "save": "Ruaj orarin",
+      "exceptionTitle": "Shto përjashtim",
+      "wholeClinic": "Gjithë klinika",
+      "closed": "Mbyllur",
+      "exceptionHint": "Për orar të ndryshuar hiqe shenjën te 'Mbyllur' dhe jep orët.",
+      "add": "Shto",
+      "weekdays": { "0": "E diel", "1": "E hënë", "2": "E martë", "3": "E mërkurë", "4": "E enjte", "5": "E premte", "6": "E shtunë" }
     }
   },
   "Common": {
