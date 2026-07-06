@@ -11,6 +11,13 @@
     "submit": "Hyr",
     "error": "Email ose fjalëkalim i gabuar"
   },
+  "Register": {
+    "title": "Regjistro klinikën tënde",
+    "submit": "Regjistrohu",
+    "fields": { "ownerName": "Emri juaj", "email": "Email", "password": "Fjalëkalimi",
+      "clinicName": "Emri i klinikës", "city": "Qyteti", "address": "Adresa", "phone": "Telefoni" },
+    "errors": { "INVALID_INPUT": "Të dhëna të pavlefshme", "EMAIL_TAKEN": "Ky email është i zënë", "UNKNOWN": "Gabim i papritur" }
+  },
   "Common": {
     "appName": "Dentbook"
   }

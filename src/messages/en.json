@@ -11,6 +11,13 @@
     "submit": "Sign in",
     "error": "Wrong email or password"
   },
+  "Register": {
+    "title": "Register your clinic",
+    "submit": "Sign up",
+    "fields": { "ownerName": "Your name", "email": "Email", "password": "Password",
+      "clinicName": "Clinic name", "city": "City", "address": "Address", "phone": "Phone" },
+    "errors": { "INVALID_INPUT": "Invalid input", "EMAIL_TAKEN": "This email is already taken", "UNKNOWN": "Unexpected error" }
+  },
   "Common": {
     "appName": "Dentbook"
   }

@@ -30,8 +30,9 @@ export async function requireStaff(): Promise<StaffContext> {
     import("next/navigation"),
   ]);
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
-  const m = await resolveStaffMembership(session.user.id);
-  if (!m) redirect("/login");
-  return { userId: session.user.id, ...m };
+  const userId = session?.user?.id;
+  if (!userId) return redirect("/login");
+  const m = await resolveStaffMembership(userId);
+  if (!m) return redirect("/login");
+  return { userId, ...m };
 }
