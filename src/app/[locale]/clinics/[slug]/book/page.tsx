@@ -80,7 +80,12 @@ export default async function BookPage({
       } catch {
         redirect(`${back}&phone=${encodeURIComponent(f("phone"))}&name=${encodeURIComponent(f("name"))}&sent=1&error=INVALID_CODE`);
       }
-      userId = (await auth())?.user?.id;
+      // auth() can't see the cookie signIn just set within this same action;
+      // signIn succeeding means the OTP for this phone was verified, so the
+      // phone lookup is trusted.
+      userId = (await auth())?.user?.id ??
+        (await withDbContext({ role: "auth" }, (tx) =>
+          tx.user.findUnique({ where: { phone: f("phone") } })))?.id;
     }
     if (!userId) redirect(`${back}&error=UNKNOWN`);
 
