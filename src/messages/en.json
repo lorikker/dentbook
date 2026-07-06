@@ -21,6 +21,7 @@
   "Dashboard": {
     "nav": {
       "appointments": "Appointments",
+      "requests": "Requests",
       "services": "Services",
       "staff": "Staff",
       "schedules": "Schedules",
@@ -28,6 +29,13 @@
     },
     "todayTitle": "Today's appointments",
     "noAppointments": "No appointments today",
+    "cancel": "Cancel",
+    "requests": {
+      "title": "Pending requests",
+      "empty": "No pending requests",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
     "services": {
       "title": "Services",
       "name": "Name",

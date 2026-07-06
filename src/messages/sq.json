@@ -21,6 +21,7 @@
   "Dashboard": {
     "nav": {
       "appointments": "Terminet",
+      "requests": "Kërkesat",
       "services": "Shërbimet",
       "staff": "Stafi",
       "schedules": "Oraret",
@@ -28,6 +29,13 @@
     },
     "todayTitle": "Terminet e sotme",
     "noAppointments": "Nuk ka termine për sot",
+    "cancel": "Anulo",
+    "requests": {
+      "title": "Kërkesat në pritje",
+      "empty": "Nuk ka kërkesa në pritje",
+      "accept": "Prano",
+      "decline": "Refuzo"
+    },
     "services": {
       "title": "Shërbimet",
       "name": "Emri",
