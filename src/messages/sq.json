@@ -27,7 +27,20 @@
       "settings": "Cilësimet"
     },
     "todayTitle": "Terminet e sotme",
-    "noAppointments": "Nuk ka termine për sot"
+    "noAppointments": "Nuk ka termine për sot",
+    "services": {
+      "title": "Shërbimet",
+      "name": "Emri",
+      "nameSq": "Emri (shqip)",
+      "nameEn": "Emri (anglisht)",
+      "duration": "Kohëzgjatja (min)",
+      "price": "Çmimi (€)",
+      "deposit": "Depozita (€)",
+      "activate": "Aktivizo",
+      "deactivate": "Çaktivizo",
+      "addTitle": "Shto shërbim",
+      "add": "Shto"
+    }
   },
   "Common": {
     "appName": "Dentbook"

@@ -27,7 +27,20 @@
       "settings": "Settings"
     },
     "todayTitle": "Today's appointments",
-    "noAppointments": "No appointments today"
+    "noAppointments": "No appointments today",
+    "services": {
+      "title": "Services",
+      "name": "Name",
+      "nameSq": "Name (Albanian)",
+      "nameEn": "Name (English)",
+      "duration": "Duration (min)",
+      "price": "Price (€)",
+      "deposit": "Deposit (€)",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "addTitle": "Add service",
+      "add": "Add"
+    }
   },
   "Common": {
     "appName": "Dentbook"
