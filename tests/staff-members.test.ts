@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { direct, truncateAll } from "./helpers/db";
-import { addStaffMember, StaffError } from "@/lib/staff-members";
+import { addStaffMember, listStaff, StaffError } from "@/lib/staff-members";
 
 let ownerCtx: { userId: string; clinicId: string; role: "OWNER" };
 let receptionCtx: { userId: string; clinicId: string; role: "RECEPTIONIST" };
@@ -39,6 +39,11 @@ describe("addStaffMember", () => {
       name: "ignored", email: "ex@x.com", password: "ignored123",
       role: "RECEPTIONIST" });
     expect(m.userId).toBe(existing.id);
+  });
+  it("listStaff exposes colleague user rows under the staff RLS context", async () => {
+    const staff = await listStaff(receptionCtx);
+    expect(staff.length).toBeGreaterThanOrEqual(2);
+    for (const m of staff) expect(m.user?.name).toBeTruthy();
   });
   it("non-owner cannot add staff", async () => {
     await expect(addStaffMember(receptionCtx, {

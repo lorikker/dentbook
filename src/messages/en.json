@@ -64,6 +64,20 @@
       "exceptionHint": "For altered hours untick 'Closed' and provide the times.",
       "add": "Add",
       "weekdays": { "0": "Sunday", "1": "Monday", "2": "Tuesday", "3": "Wednesday", "4": "Thursday", "5": "Friday", "6": "Saturday" }
+    },
+    "settings": {
+      "title": "Clinic settings",
+      "name": "Clinic name",
+      "city": "City",
+      "address": "Address",
+      "phone": "Phone",
+      "aboutSq": "About (Albanian)",
+      "aboutEn": "About (English)",
+      "brandColor": "Brand color",
+      "bookingMode": "Booking mode",
+      "modes": { "INSTANT": "Instant booking", "APPROVAL": "Requires approval" },
+      "cancellationWindow": "Cancellation window (hours)",
+      "save": "Save"
     }
   },
   "Common": {

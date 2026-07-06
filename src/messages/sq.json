@@ -64,6 +64,20 @@
       "exceptionHint": "Për orar të ndryshuar hiqe shenjën te 'Mbyllur' dhe jep orët.",
       "add": "Shto",
       "weekdays": { "0": "E diel", "1": "E hënë", "2": "E martë", "3": "E mërkurë", "4": "E enjte", "5": "E premte", "6": "E shtunë" }
+    },
+    "settings": {
+      "title": "Cilësimet e klinikës",
+      "name": "Emri i klinikës",
+      "city": "Qyteti",
+      "address": "Adresa",
+      "phone": "Telefoni",
+      "aboutSq": "Përshkrimi (shqip)",
+      "aboutEn": "Përshkrimi (anglisht)",
+      "brandColor": "Ngjyra e brendit",
+      "bookingMode": "Mënyra e rezervimit",
+      "modes": { "INSTANT": "Rezervim i menjëhershëm", "APPROVAL": "Me aprovim" },
+      "cancellationWindow": "Afati i anulimit (orë)",
+      "save": "Ruaj"
     }
   },
   "Common": {
