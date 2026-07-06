@@ -11,6 +11,75 @@
     "submit": "Hyr",
     "error": "Email ose fjalëkalim i gabuar"
   },
+  "Register": {
+    "title": "Regjistro klinikën tënde",
+    "submit": "Regjistrohu",
+    "fields": { "ownerName": "Emri juaj", "email": "Email", "password": "Fjalëkalimi",
+      "clinicName": "Emri i klinikës", "city": "Qyteti", "address": "Adresa", "phone": "Telefoni" },
+    "errors": { "INVALID_INPUT": "Të dhëna të pavlefshme", "EMAIL_TAKEN": "Ky email është i zënë", "UNKNOWN": "Gabim i papritur" }
+  },
+  "Dashboard": {
+    "nav": {
+      "appointments": "Terminet",
+      "services": "Shërbimet",
+      "staff": "Stafi",
+      "schedules": "Oraret",
+      "settings": "Cilësimet"
+    },
+    "todayTitle": "Terminet e sotme",
+    "noAppointments": "Nuk ka termine për sot",
+    "services": {
+      "title": "Shërbimet",
+      "name": "Emri",
+      "nameSq": "Emri (shqip)",
+      "nameEn": "Emri (anglisht)",
+      "duration": "Kohëzgjatja (min)",
+      "price": "Çmimi (€)",
+      "deposit": "Depozita (€)",
+      "activate": "Aktivizo",
+      "deactivate": "Çaktivizo",
+      "addTitle": "Shto shërbim",
+      "add": "Shto"
+    },
+    "staff": {
+      "title": "Stafi",
+      "name": "Emri",
+      "email": "Email",
+      "tempPassword": "Fjalëkalimi i përkohshëm",
+      "titleField": "Titulli (p.sh. Dr. med. dent.)",
+      "roles": { "DENTIST": "Dentist", "RECEPTIONIST": "Recepsionist", "OWNER": "Pronar" },
+      "addTitle": "Shto anëtar stafi",
+      "add": "Shto"
+    },
+    "schedules": {
+      "title": "Oraret",
+      "noSchedule": "Pa orar të caktuar",
+      "setTitle": "Cakto orarin javor",
+      "entriesPlaceholder": "1,09:00,17:00\n2,09:00,17:00",
+      "entriesHint": "Një rresht për interval: dita (0=E diel .. 6=E shtunë), fillimi, mbarimi. Zëvendëson orarin ekzistues.",
+      "save": "Ruaj orarin",
+      "exceptionTitle": "Shto përjashtim",
+      "wholeClinic": "Gjithë klinika",
+      "closed": "Mbyllur",
+      "exceptionHint": "Për orar të ndryshuar hiqe shenjën te 'Mbyllur' dhe jep orët.",
+      "add": "Shto",
+      "weekdays": { "0": "E diel", "1": "E hënë", "2": "E martë", "3": "E mërkurë", "4": "E enjte", "5": "E premte", "6": "E shtunë" }
+    },
+    "settings": {
+      "title": "Cilësimet e klinikës",
+      "name": "Emri i klinikës",
+      "city": "Qyteti",
+      "address": "Adresa",
+      "phone": "Telefoni",
+      "aboutSq": "Përshkrimi (shqip)",
+      "aboutEn": "Përshkrimi (anglisht)",
+      "brandColor": "Ngjyra e brendit",
+      "bookingMode": "Mënyra e rezervimit",
+      "modes": { "INSTANT": "Rezervim i menjëhershëm", "APPROVAL": "Me aprovim" },
+      "cancellationWindow": "Afati i anulimit (orë)",
+      "save": "Ruaj"
+    }
+  },
   "Common": {
     "appName": "Dentbook"
   }

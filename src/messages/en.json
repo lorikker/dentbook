@@ -11,6 +11,75 @@
     "submit": "Sign in",
     "error": "Wrong email or password"
   },
+  "Register": {
+    "title": "Register your clinic",
+    "submit": "Sign up",
+    "fields": { "ownerName": "Your name", "email": "Email", "password": "Password",
+      "clinicName": "Clinic name", "city": "City", "address": "Address", "phone": "Phone" },
+    "errors": { "INVALID_INPUT": "Invalid input", "EMAIL_TAKEN": "This email is already taken", "UNKNOWN": "Unexpected error" }
+  },
+  "Dashboard": {
+    "nav": {
+      "appointments": "Appointments",
+      "services": "Services",
+      "staff": "Staff",
+      "schedules": "Schedules",
+      "settings": "Settings"
+    },
+    "todayTitle": "Today's appointments",
+    "noAppointments": "No appointments today",
+    "services": {
+      "title": "Services",
+      "name": "Name",
+      "nameSq": "Name (Albanian)",
+      "nameEn": "Name (English)",
+      "duration": "Duration (min)",
+      "price": "Price (€)",
+      "deposit": "Deposit (€)",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "addTitle": "Add service",
+      "add": "Add"
+    },
+    "staff": {
+      "title": "Staff",
+      "name": "Name",
+      "email": "Email",
+      "tempPassword": "Temporary password",
+      "titleField": "Title (e.g. Dr. med. dent.)",
+      "roles": { "DENTIST": "Dentist", "RECEPTIONIST": "Receptionist", "OWNER": "Owner" },
+      "addTitle": "Add staff member",
+      "add": "Add"
+    },
+    "schedules": {
+      "title": "Schedules",
+      "noSchedule": "No schedule set",
+      "setTitle": "Set weekly schedule",
+      "entriesPlaceholder": "1,09:00,17:00\n2,09:00,17:00",
+      "entriesHint": "One line per interval: weekday (0=Sunday .. 6=Saturday), start, end. Replaces the existing schedule.",
+      "save": "Save schedule",
+      "exceptionTitle": "Add exception",
+      "wholeClinic": "Whole clinic",
+      "closed": "Closed",
+      "exceptionHint": "For altered hours untick 'Closed' and provide the times.",
+      "add": "Add",
+      "weekdays": { "0": "Sunday", "1": "Monday", "2": "Tuesday", "3": "Wednesday", "4": "Thursday", "5": "Friday", "6": "Saturday" }
+    },
+    "settings": {
+      "title": "Clinic settings",
+      "name": "Clinic name",
+      "city": "City",
+      "address": "Address",
+      "phone": "Phone",
+      "aboutSq": "About (Albanian)",
+      "aboutEn": "About (English)",
+      "brandColor": "Brand color",
+      "bookingMode": "Booking mode",
+      "modes": { "INSTANT": "Instant booking", "APPROVAL": "Requires approval" },
+      "cancellationWindow": "Cancellation window (hours)",
+      "save": "Save"
+    }
+  },
   "Common": {
     "appName": "Dentbook"
   }
