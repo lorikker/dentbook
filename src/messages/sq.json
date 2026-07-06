@@ -18,6 +18,17 @@
       "clinicName": "Emri i klinikës", "city": "Qyteti", "address": "Adresa", "phone": "Telefoni" },
     "errors": { "INVALID_INPUT": "Të dhëna të pavlefshme", "EMAIL_TAKEN": "Ky email është i zënë", "UNKNOWN": "Gabim i papritur" }
   },
+  "Dashboard": {
+    "nav": {
+      "appointments": "Terminet",
+      "services": "Shërbimet",
+      "staff": "Stafi",
+      "schedules": "Oraret",
+      "settings": "Cilësimet"
+    },
+    "todayTitle": "Terminet e sotme",
+    "noAppointments": "Nuk ka termine për sot"
+  },
   "Common": {
     "appName": "Dentbook"
   }

@@ -18,6 +18,17 @@
       "clinicName": "Clinic name", "city": "City", "address": "Address", "phone": "Phone" },
     "errors": { "INVALID_INPUT": "Invalid input", "EMAIL_TAKEN": "This email is already taken", "UNKNOWN": "Unexpected error" }
   },
+  "Dashboard": {
+    "nav": {
+      "appointments": "Appointments",
+      "services": "Services",
+      "staff": "Staff",
+      "schedules": "Schedules",
+      "settings": "Settings"
+    },
+    "todayTitle": "Today's appointments",
+    "noAppointments": "No appointments today"
+  },
   "Common": {
     "appName": "Dentbook"
   }
