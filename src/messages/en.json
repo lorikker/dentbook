@@ -21,6 +21,7 @@
   "Dashboard": {
     "nav": {
       "appointments": "Appointments",
+      "requests": "Requests",
       "services": "Services",
       "staff": "Staff",
       "schedules": "Schedules",
@@ -28,6 +29,13 @@
     },
     "todayTitle": "Today's appointments",
     "noAppointments": "No appointments today",
+    "cancel": "Cancel",
+    "requests": {
+      "title": "Pending requests",
+      "empty": "No pending requests",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
     "services": {
       "title": "Services",
       "name": "Name",
@@ -78,6 +86,66 @@
       "modes": { "INSTANT": "Instant booking", "APPROVAL": "Requires approval" },
       "cancellationWindow": "Cancellation window (hours)",
       "save": "Save"
+    }
+  },
+  "Book": {
+    "title": "Book an appointment",
+    "rescheduleTitle": "Reschedule appointment",
+    "anyDentist": "Any available dentist",
+    "showSlots": "See free slots",
+    "noSlots": "No free slots on this day",
+    "otherDate": "Pick another date",
+    "yourName": "Your name",
+    "yourPhone": "Phone number",
+    "sendCode": "Send code",
+    "codeSentTo": "Code sent to {phone}",
+    "code": "6-digit code",
+    "confirm": "Confirm booking",
+    "confirmReschedule": "Confirm reschedule",
+    "errors": {
+      "INVALID_CODE": "Wrong code",
+      "EXPIRED": "Code expired — request a new one",
+      "TOO_MANY_ATTEMPTS": "Too many attempts — request a new code",
+      "RATE_LIMITED_PHONE": "Too many requests — try again later",
+      "RATE_LIMITED_IP": "Too many requests — try again later",
+      "SLOT_TAKEN": "That slot was just taken — pick another",
+      "WINDOW_PASSED": "The change window has passed",
+      "NOT_ACTIVE": "This appointment is no longer active",
+      "NOT_FOUND": "Appointment not found",
+      "INVALID_INPUT": "Invalid input",
+      "UNKNOWN": "Unexpected error"
+    }
+  },
+  "Clinics": {
+    "title": "Clinics",
+    "allCities": "All cities",
+    "empty": "No clinics found",
+    "dentists": "Dentists",
+    "services": "Services",
+    "book": "Book"
+  },
+  "Manage": {
+    "title": "Your appointment",
+    "bannerBooked": "Appointment booked!",
+    "bannerUpdated": "Appointment rescheduled!",
+    "bannerCancelled": "Appointment cancelled.",
+    "cancel": "Cancel appointment",
+    "reschedule": "Reschedule",
+    "notChangeable": "This appointment can no longer be changed via this link.",
+    "status": {
+      "PENDING": "Awaiting approval",
+      "CONFIRMED": "Confirmed",
+      "DECLINED": "Declined",
+      "CANCELLED": "Cancelled",
+      "COMPLETED": "Completed",
+      "NO_SHOW": "No-show"
+    },
+    "errors": {
+      "WINDOW_PASSED": "The cancellation window has passed",
+      "NOT_ACTIVE": "The appointment is no longer active",
+      "NOT_FOUND": "Appointment not found",
+      "SLOT_TAKEN": "The new slot was just taken",
+      "UNKNOWN": "Unexpected error"
     }
   },
   "Common": {

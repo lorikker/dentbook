@@ -21,6 +21,7 @@
   "Dashboard": {
     "nav": {
       "appointments": "Terminet",
+      "requests": "Kërkesat",
       "services": "Shërbimet",
       "staff": "Stafi",
       "schedules": "Oraret",
@@ -28,6 +29,13 @@
     },
     "todayTitle": "Terminet e sotme",
     "noAppointments": "Nuk ka termine për sot",
+    "cancel": "Anulo",
+    "requests": {
+      "title": "Kërkesat në pritje",
+      "empty": "Nuk ka kërkesa në pritje",
+      "accept": "Prano",
+      "decline": "Refuzo"
+    },
     "services": {
       "title": "Shërbimet",
       "name": "Emri",
@@ -78,6 +86,66 @@
       "modes": { "INSTANT": "Rezervim i menjëhershëm", "APPROVAL": "Me aprovim" },
       "cancellationWindow": "Afati i anulimit (orë)",
       "save": "Ruaj"
+    }
+  },
+  "Book": {
+    "title": "Rezervo termin",
+    "rescheduleTitle": "Zhvendos terminin",
+    "anyDentist": "Cilido dentist i lirë",
+    "showSlots": "Shiko oraret e lira",
+    "noSlots": "Nuk ka orare të lira për këtë ditë",
+    "otherDate": "Zgjidh datë tjetër",
+    "yourName": "Emri juaj",
+    "yourPhone": "Numri i telefonit",
+    "sendCode": "Dërgo kodin",
+    "codeSentTo": "Kodi u dërgua në {phone}",
+    "code": "Kodi 6-shifror",
+    "confirm": "Konfirmo terminin",
+    "confirmReschedule": "Konfirmo zhvendosjen",
+    "errors": {
+      "INVALID_CODE": "Kod i gabuar",
+      "EXPIRED": "Kodi ka skaduar — kërko një të ri",
+      "TOO_MANY_ATTEMPTS": "Shumë tentime — kërko kod të ri",
+      "RATE_LIMITED_PHONE": "Shumë kërkesa — provo më vonë",
+      "RATE_LIMITED_IP": "Shumë kërkesa — provo më vonë",
+      "SLOT_TAKEN": "Ky orar sapo u zu — zgjidh një tjetër",
+      "WINDOW_PASSED": "Afati i ndryshimit ka kaluar",
+      "NOT_ACTIVE": "Ky termin nuk është më aktiv",
+      "NOT_FOUND": "Termini nuk u gjet",
+      "INVALID_INPUT": "Të dhëna të pavlefshme",
+      "UNKNOWN": "Gabim i papritur"
+    }
+  },
+  "Clinics": {
+    "title": "Klinikat",
+    "allCities": "Të gjitha qytetet",
+    "empty": "Nuk u gjet asnjë klinikë",
+    "dentists": "Dentistët",
+    "services": "Shërbimet",
+    "book": "Rezervo"
+  },
+  "Manage": {
+    "title": "Termini juaj",
+    "bannerBooked": "Termini u rezervua me sukses!",
+    "bannerUpdated": "Termini u zhvendos me sukses!",
+    "bannerCancelled": "Termini u anulua.",
+    "cancel": "Anulo terminin",
+    "reschedule": "Zhvendos terminin",
+    "notChangeable": "Ky termin nuk mund të ndryshohet më përmes këtij linku.",
+    "status": {
+      "PENDING": "Në pritje të aprovimit",
+      "CONFIRMED": "I konfirmuar",
+      "DECLINED": "I refuzuar",
+      "CANCELLED": "I anuluar",
+      "COMPLETED": "I përfunduar",
+      "NO_SHOW": "Nuk u paraqit"
+    },
+    "errors": {
+      "WINDOW_PASSED": "Afati i anulimit ka kaluar",
+      "NOT_ACTIVE": "Termini nuk është më aktiv",
+      "NOT_FOUND": "Termini nuk u gjet",
+      "SLOT_TAKEN": "Orari i ri sapo u zu",
+      "UNKNOWN": "Gabim i papritur"
     }
   },
   "Common": {

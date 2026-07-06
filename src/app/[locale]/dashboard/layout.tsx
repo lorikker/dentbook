@@ -13,9 +13,9 @@ export default async function DashboardLayout({
     (tx) => tx.clinic.findUniqueOrThrow({ where: { id: ctx.clinicId } }),
   );
   const nav = [
-    ["", t("nav.appointments")], ["services", t("nav.services")],
-    ["staff", t("nav.staff")], ["schedules", t("nav.schedules")],
-    ["settings", t("nav.settings")],
+    ["", t("nav.appointments")], ["requests", t("nav.requests")],
+    ["services", t("nav.services")], ["staff", t("nav.staff")],
+    ["schedules", t("nav.schedules")], ["settings", t("nav.settings")],
   ] as const;
   return (
     <div className="flex min-h-screen">
