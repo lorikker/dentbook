@@ -40,6 +40,16 @@
       "deactivate": "Çaktivizo",
       "addTitle": "Shto shërbim",
       "add": "Shto"
+    },
+    "staff": {
+      "title": "Stafi",
+      "name": "Emri",
+      "email": "Email",
+      "tempPassword": "Fjalëkalimi i përkohshëm",
+      "titleField": "Titulli (p.sh. Dr. med. dent.)",
+      "roles": { "DENTIST": "Dentist", "RECEPTIONIST": "Recepsionist", "OWNER": "Pronar" },
+      "addTitle": "Shto anëtar stafi",
+      "add": "Shto"
     }
   },
   "Common": {

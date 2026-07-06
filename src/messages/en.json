@@ -40,6 +40,16 @@
       "deactivate": "Deactivate",
       "addTitle": "Add service",
       "add": "Add"
+    },
+    "staff": {
+      "title": "Staff",
+      "name": "Name",
+      "email": "Email",
+      "tempPassword": "Temporary password",
+      "titleField": "Title (e.g. Dr. med. dent.)",
+      "roles": { "DENTIST": "Dentist", "RECEPTIONIST": "Receptionist", "OWNER": "Owner" },
+      "addTitle": "Add staff member",
+      "add": "Add"
     }
   },
   "Common": {
