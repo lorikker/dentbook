@@ -116,6 +116,30 @@
     "services": "Shërbimet",
     "book": "Rezervo"
   },
+  "Manage": {
+    "title": "Termini juaj",
+    "bannerBooked": "Termini u rezervua me sukses!",
+    "bannerUpdated": "Termini u zhvendos me sukses!",
+    "bannerCancelled": "Termini u anulua.",
+    "cancel": "Anulo terminin",
+    "reschedule": "Zhvendos terminin",
+    "notChangeable": "Ky termin nuk mund të ndryshohet më përmes këtij linku.",
+    "status": {
+      "PENDING": "Në pritje të aprovimit",
+      "CONFIRMED": "I konfirmuar",
+      "DECLINED": "I refuzuar",
+      "CANCELLED": "I anuluar",
+      "COMPLETED": "I përfunduar",
+      "NO_SHOW": "Nuk u paraqit"
+    },
+    "errors": {
+      "WINDOW_PASSED": "Afati i anulimit ka kaluar",
+      "NOT_ACTIVE": "Termini nuk është më aktiv",
+      "NOT_FOUND": "Termini nuk u gjet",
+      "SLOT_TAKEN": "Orari i ri sapo u zu",
+      "UNKNOWN": "Gabim i papritur"
+    }
+  },
   "Common": {
     "appName": "Dentbook"
   }

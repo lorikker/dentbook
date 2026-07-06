@@ -116,6 +116,30 @@
     "services": "Services",
     "book": "Book"
   },
+  "Manage": {
+    "title": "Your appointment",
+    "bannerBooked": "Appointment booked!",
+    "bannerUpdated": "Appointment rescheduled!",
+    "bannerCancelled": "Appointment cancelled.",
+    "cancel": "Cancel appointment",
+    "reschedule": "Reschedule",
+    "notChangeable": "This appointment can no longer be changed via this link.",
+    "status": {
+      "PENDING": "Awaiting approval",
+      "CONFIRMED": "Confirmed",
+      "DECLINED": "Declined",
+      "CANCELLED": "Cancelled",
+      "COMPLETED": "Completed",
+      "NO_SHOW": "No-show"
+    },
+    "errors": {
+      "WINDOW_PASSED": "The cancellation window has passed",
+      "NOT_ACTIVE": "The appointment is no longer active",
+      "NOT_FOUND": "Appointment not found",
+      "SLOT_TAKEN": "The new slot was just taken",
+      "UNKNOWN": "Unexpected error"
+    }
+  },
   "Common": {
     "appName": "Dentbook"
   }
