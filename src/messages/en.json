@@ -80,6 +80,34 @@
       "save": "Save"
     }
   },
+  "Book": {
+    "title": "Book an appointment",
+    "rescheduleTitle": "Reschedule appointment",
+    "anyDentist": "Any available dentist",
+    "showSlots": "See free slots",
+    "noSlots": "No free slots on this day",
+    "otherDate": "Pick another date",
+    "yourName": "Your name",
+    "yourPhone": "Phone number",
+    "sendCode": "Send code",
+    "codeSentTo": "Code sent to {phone}",
+    "code": "6-digit code",
+    "confirm": "Confirm booking",
+    "confirmReschedule": "Confirm reschedule",
+    "errors": {
+      "INVALID_CODE": "Wrong code",
+      "EXPIRED": "Code expired — request a new one",
+      "TOO_MANY_ATTEMPTS": "Too many attempts — request a new code",
+      "RATE_LIMITED_PHONE": "Too many requests — try again later",
+      "RATE_LIMITED_IP": "Too many requests — try again later",
+      "SLOT_TAKEN": "That slot was just taken — pick another",
+      "WINDOW_PASSED": "The change window has passed",
+      "NOT_ACTIVE": "This appointment is no longer active",
+      "NOT_FOUND": "Appointment not found",
+      "INVALID_INPUT": "Invalid input",
+      "UNKNOWN": "Unexpected error"
+    }
+  },
   "Clinics": {
     "title": "Clinics",
     "allCities": "All cities",

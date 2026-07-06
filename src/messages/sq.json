@@ -80,6 +80,34 @@
       "save": "Ruaj"
     }
   },
+  "Book": {
+    "title": "Rezervo termin",
+    "rescheduleTitle": "Zhvendos terminin",
+    "anyDentist": "Cilido dentist i lirë",
+    "showSlots": "Shiko oraret e lira",
+    "noSlots": "Nuk ka orare të lira për këtë ditë",
+    "otherDate": "Zgjidh datë tjetër",
+    "yourName": "Emri juaj",
+    "yourPhone": "Numri i telefonit",
+    "sendCode": "Dërgo kodin",
+    "codeSentTo": "Kodi u dërgua në {phone}",
+    "code": "Kodi 6-shifror",
+    "confirm": "Konfirmo terminin",
+    "confirmReschedule": "Konfirmo zhvendosjen",
+    "errors": {
+      "INVALID_CODE": "Kod i gabuar",
+      "EXPIRED": "Kodi ka skaduar — kërko një të ri",
+      "TOO_MANY_ATTEMPTS": "Shumë tentime — kërko kod të ri",
+      "RATE_LIMITED_PHONE": "Shumë kërkesa — provo më vonë",
+      "RATE_LIMITED_IP": "Shumë kërkesa — provo më vonë",
+      "SLOT_TAKEN": "Ky orar sapo u zu — zgjidh një tjetër",
+      "WINDOW_PASSED": "Afati i ndryshimit ka kaluar",
+      "NOT_ACTIVE": "Ky termin nuk është më aktiv",
+      "NOT_FOUND": "Termini nuk u gjet",
+      "INVALID_INPUT": "Të dhëna të pavlefshme",
+      "UNKNOWN": "Gabim i papritur"
+    }
+  },
   "Clinics": {
     "title": "Klinikat",
     "allCities": "Të gjitha qytetet",
