@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { withDbContext } from "./tenant-db";
 import { hashPassword } from "./staff-auth";
+import { logActivity } from "./models/activity-log";
 
 export class RegisterError extends Error {
   constructor(public code: "INVALID_INPUT" | "EMAIL_TAKEN") { super(code); }
@@ -45,6 +46,7 @@ export async function registerClinic(input: RegisterInput) {
       data: { slug, name: d.clinicName, city: d.city,
               address: d.address, phone: d.phone },
     });
+    await logActivity("clinic_registered", `${clinic.name} registered`, { clinicId: clinic.id });
     await tx.membership.create({
       data: { userId: user.id, clinicId: clinic.id, role: "OWNER" },
     });

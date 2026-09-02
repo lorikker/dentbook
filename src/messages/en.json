@@ -179,5 +179,17 @@
     "invalidEmail": "Enter a valid email address",
     "success": "Your message has been sent. We'll get back to you soon.",
     "error": "Something went wrong — please try again."
+  },
+  "Admin": {
+    "title": "Admin panel",
+    "pendingClinics": "Pending clinic approvals",
+    "noPending": "No clinics awaiting approval",
+    "approve": "Approve",
+    "activityFeed": "Activity feed",
+    "noActivity": "No activity yet",
+    "testimonials": "Testimonial moderation",
+    "noTestimonials": "No testimonials yet",
+    "publish": "Publish",
+    "hide": "Hide"
   }
 }

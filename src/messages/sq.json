@@ -179,5 +179,17 @@
     "invalidEmail": "Jep një adresë email të vlefshme",
     "success": "Mesazhi juaj u dërgua. Do t'ju përgjigjemi së shpejti.",
     "error": "Diçka shkoi keq — provo përsëri."
+  },
+  "Admin": {
+    "title": "Paneli i administratorit",
+    "pendingClinics": "Klinikat në pritje të aprovimit",
+    "noPending": "Nuk ka klinika në pritje të aprovimit",
+    "approve": "Aprovo",
+    "activityFeed": "Aktiviteti i fundit",
+    "noActivity": "Ende nuk ka aktivitet",
+    "testimonials": "Moderimi i dëshmive",
+    "noTestimonials": "Ende nuk ka dëshmi",
+    "publish": "Publiko",
+    "hide": "Fshih"
   }
 }

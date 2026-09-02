@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { withDbContext } from "./tenant-db";
 import { getAvailableSlots } from "./availability";
+import { logActivity } from "./models/activity-log";
 
 export class BookingError extends Error {
   constructor(public code: "INVALID_INPUT" | "NOT_FOUND" | "SLOT_TAKEN") { super(code); }
@@ -64,6 +65,7 @@ export async function createBooking(input: BookingInput) {
           status: clinic.bookingMode === "INSTANT" ? "CONFIRMED" : "PENDING",
         },
       }));
+    await logActivity("appointment_booked", "New appointment booked", { appointmentId: appt.id });
     return { appointmentId: appt.id, manageToken: appt.manageToken,
              status: appt.status as "PENDING" | "CONFIRMED" };
   } catch (e) {
