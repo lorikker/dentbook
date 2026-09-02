@@ -65,7 +65,13 @@ export async function createBooking(input: BookingInput) {
           status: clinic.bookingMode === "INSTANT" ? "CONFIRMED" : "PENDING",
         },
       }));
-    await logActivity("appointment_booked", "New appointment booked", { appointmentId: appt.id });
+    // Non-fatal: the appointment is already committed, so a Mongo hiccup
+    // here must not surface as a booking failure to the patient.
+    try {
+      await logActivity("appointment_booked", "New appointment booked", { appointmentId: appt.id });
+    } catch (e) {
+      console.error("logActivity(appointment_booked) failed", e);
+    }
     return { appointmentId: appt.id, manageToken: appt.manageToken,
              status: appt.status as "PENDING" | "CONFIRMED" };
   } catch (e) {

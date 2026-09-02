@@ -10,7 +10,7 @@ export default async function ProfilePage() {
 
   const t = await getTranslations("Profile");
   const user = await withDbContext(
-    { role: "auth", userId: session.user.id },
+    { role: "patient", userId: session.user.id },
     (tx) => tx.user.findUniqueOrThrow({ where: { id: session.user.id } }),
   );
 

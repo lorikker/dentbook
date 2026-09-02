@@ -5,7 +5,7 @@ import Facebook from "next-auth/providers/facebook";
 import { z } from "zod";
 import { verifyOtp } from "@/lib/otp";
 import { verifyStaffLogin } from "@/lib/staff-auth";
-import { upsertOAuthUser } from "@/lib/oauth-user";
+import { isEmailLinkableForOAuth, upsertOAuthUser } from "@/lib/oauth-user";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -56,6 +56,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ account, profile }) {
+      if (account && (account.provider === "google" || account.provider === "facebook")) {
+        // Facebook doesn't expose email_verified; Google does and only
+        // asserts verified addresses, so `=== false` (not falsy) is the
+        // correct check — undefined means "provider doesn't tell us".
+        if (!profile?.email || profile.email_verified === false) return false;
+        if (!(await isEmailLinkableForOAuth(profile.email))) return false;
+      }
+      return true;
+    },
     async jwt({ token, user, account }) {
       if (account && (account.provider === "google" || account.provider === "facebook")) {
         if (user?.email) {

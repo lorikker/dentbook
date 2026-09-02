@@ -30,7 +30,7 @@ export async function registerClinic(input: RegisterInput) {
   const d = parsed.data;
   const passwordHash = await hashPassword(d.password);
 
-  return withDbContext({ role: "auth" }, async (tx) => {
+  const result = await withDbContext({ role: "auth" }, async (tx) => {
     if (await tx.user.findUnique({ where: { email: d.email } })) {
       throw new RegisterError("EMAIL_TAKEN");
     }
@@ -46,7 +46,6 @@ export async function registerClinic(input: RegisterInput) {
       data: { slug, name: d.clinicName, city: d.city,
               address: d.address, phone: d.phone },
     });
-    await logActivity("clinic_registered", `${clinic.name} registered`, { clinicId: clinic.id });
     await tx.membership.create({
       data: { userId: user.id, clinicId: clinic.id, role: "OWNER" },
     });
@@ -54,6 +53,17 @@ export async function registerClinic(input: RegisterInput) {
       data: { clinicId: clinic.id, plan: "TRIAL", status: "ACTIVE",
               trialEndsAt: new Date(Date.now() + 30 * 24 * 3600 * 1000) },
     });
-    return { clinicId: clinic.id, userId: user.id };
+    return { clinicId: clinic.id, userId: user.id, clinicName: clinic.name };
   });
+
+  // Outside the transaction and non-fatal: the activity feed is a nice-to-have
+  // view, not a condition of a successful registration.
+  try {
+    await logActivity("clinic_registered", `${result.clinicName} registered`,
+      { clinicId: result.clinicId });
+  } catch (e) {
+    console.error("logActivity(clinic_registered) failed", e);
+  }
+
+  return { clinicId: result.clinicId, userId: result.userId };
 }
