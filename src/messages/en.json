@@ -150,5 +150,14 @@
   },
   "Common": {
     "appName": "Dentbook"
+  },
+  "Profile": {
+    "title": "Your profile",
+    "name": "Name",
+    "email": "Email",
+    "required": "Name is required",
+    "save": "Save",
+    "success": "Profile updated",
+    "error": "Something went wrong"
   }
 }
