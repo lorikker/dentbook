@@ -163,5 +163,21 @@
     "profile": "Profile",
     "admin": "Admin",
     "signOut": "Sign out"
+  },
+  "About": {
+    "title": "About Dentbook",
+    "intro": "Dentbook connects patients in Kosovo with dental clinics for online booking.",
+    "teamTitle": "Our team"
+  },
+  "Contact": {
+    "title": "Contact us",
+    "name": "Your name",
+    "email": "Email",
+    "message": "Message",
+    "submit": "Send message",
+    "required": "This field is required",
+    "invalidEmail": "Enter a valid email address",
+    "success": "Your message has been sent. We'll get back to you soon.",
+    "error": "Something went wrong — please try again."
   }
 }
