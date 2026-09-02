@@ -43,6 +43,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# agent orchestration scratch (progress ledger, task briefs/reports)
+/.superpowers
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
