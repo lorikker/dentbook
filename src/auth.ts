@@ -1,8 +1,11 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
+import Facebook from "next-auth/providers/facebook";
 import { z } from "zod";
 import { verifyOtp } from "@/lib/otp";
 import { verifyStaffLogin } from "@/lib/staff-auth";
+import { upsertOAuthUser } from "@/lib/oauth-user";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -43,9 +46,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                  isPlatformAdmin: user.isPlatformAdmin, kind: "staff" as const };
       },
     }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    Facebook({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      if (account && (account.provider === "google" || account.provider === "facebook")) {
+        if (user?.email) {
+          const dbUser = await upsertOAuthUser(user.email, user.name ?? user.email);
+          token.userId = dbUser.id;
+          token.kind = "patient";
+          token.isPlatformAdmin = dbUser.isPlatformAdmin;
+        }
+        return token;
+      }
       if (user) {
         token.userId = user.id;
         token.kind = user.kind;
