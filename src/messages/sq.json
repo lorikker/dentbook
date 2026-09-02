@@ -191,5 +191,14 @@
     "noTestimonials": "Ende nuk ka dëshmi",
     "publish": "Publiko",
     "hide": "Fshih"
+  },
+  "Profile": {
+    "title": "Profili juaj",
+    "name": "Emri",
+    "email": "Email",
+    "required": "Emri është i detyrueshëm",
+    "save": "Ruaj",
+    "success": "Profili u përditësua",
+    "error": "Ndodhi një gabim"
   }
 }
