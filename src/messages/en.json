@@ -122,7 +122,9 @@
     "empty": "No clinics found",
     "dentists": "Dentists",
     "services": "Services",
-    "book": "Book"
+    "book": "Book",
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites"
   },
   "Manage": {
     "title": "Your appointment",

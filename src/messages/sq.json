@@ -122,7 +122,9 @@
     "empty": "Nuk u gjet asnjë klinikë",
     "dentists": "Dentistët",
     "services": "Shërbimet",
-    "book": "Rezervo"
+    "book": "Rezervo",
+    "addFavorite": "Shto te të preferuarat",
+    "removeFavorite": "Hiq nga të preferuarat"
   },
   "Manage": {
     "title": "Termini juaj",

@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import { auth } from "@/auth";
+import { addFavorite, isFavorited, removeFavorite } from "@/lib/favorites";
 import { withDbContext } from "@/lib/tenant-db";
 
 export default async function ClinicProfilePage({
@@ -19,6 +22,24 @@ export default async function ClinicProfilePage({
     }));
   if (!clinic) notFound();
   const about = locale === "en" ? clinic.aboutEn : clinic.aboutSq;
+  const clinicId = clinic.id;
+
+  const session = await auth();
+  const favorited = session?.user?.id
+    ? await isFavorited({ userId: session.user.id }, clinicId)
+    : false;
+
+  async function toggleFavoriteAction() {
+    "use server";
+    const s = await auth();
+    if (!s?.user?.id) return;
+    if (favorited) {
+      await removeFavorite({ userId: s.user.id }, clinicId);
+    } else {
+      await addFavorite({ userId: s.user.id }, clinicId);
+    }
+    revalidatePath(`/clinics/${slug}`);
+  }
 
   return (
     <main className="mx-auto w-full max-w-3xl p-8">
@@ -27,6 +48,13 @@ export default async function ClinicProfilePage({
       </h1>
       <p className="mb-1 text-gray-600">{clinic.city} · {clinic.address}</p>
       <p className="mb-6 text-gray-600">{clinic.phone}</p>
+      {session?.user?.id && (
+        <form action={toggleFavoriteAction} className="mb-6">
+          <button className="rounded border px-4 py-2 text-sm">
+            {favorited ? t("removeFavorite") : t("addFavorite")}
+          </button>
+        </form>
+      )}
       {about && <p className="mb-8 whitespace-pre-line">{about}</p>}
 
       <h2 className="mb-2 text-xl font-semibold">{t("dentists")}</h2>

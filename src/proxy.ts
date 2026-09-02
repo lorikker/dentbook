@@ -10,6 +10,9 @@ export default function proxy(request: Parameters<typeof handle>[0]) {
 }
 
 export const config = {
-  // everything except api, static files, images
-  matcher: ["/((?!api|_next|.*\\..*).*)"],
+  // Everything except api, static files, images — and the Pages Router
+  // routes under src/pages/ (products, favorites), which are intentionally
+  // English-only and not part of next-intl's [locale] routing. Without this
+  // exclusion, next-intl rewrites these unprefixed paths and they 404.
+  matcher: ["/((?!api|_next|products|favorites|.*\\..*).*)"],
 };
