@@ -11,6 +11,7 @@ const config: Config = {
   // otherwise pick these Jest-only files up too and fail on them (no `vitest.config.ts`
   // changes allowed here).
   testRegex: "tests-jest[\\\\/].*\\.jest\\.tsx?$",
+  setupFiles: ["<rootDir>/tests-jest/setup-env.ts"],
   setupFilesAfterEnv: ["<rootDir>/tests-jest/setup.ts"],
   transform: { "^.+\\.[tj]sx?$": ["babel-jest", { configFile: "./babel.config.jest.js" }] },
   moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
