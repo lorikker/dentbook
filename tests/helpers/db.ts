@@ -33,7 +33,7 @@ export async function asContext<T>(
 export async function truncateAll() {
   await direct.$executeRawUnsafe(`
     TRUNCATE TABLE notifications, otp_codes, invoices, subscriptions, payments,
-      reviews, appointments, schedule_exceptions, schedules, dentist_services,
+      favorites, reviews, appointments, schedule_exceptions, schedules, dentist_services,
       services, memberships, clinics, users CASCADE
   `);
 }
