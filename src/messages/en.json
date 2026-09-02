@@ -163,5 +163,17 @@
     "profile": "Profile",
     "admin": "Admin",
     "signOut": "Sign out"
+  },
+  "Admin": {
+    "title": "Admin panel",
+    "pendingClinics": "Pending clinic approvals",
+    "noPending": "No clinics awaiting approval",
+    "approve": "Approve",
+    "activityFeed": "Activity feed",
+    "noActivity": "No activity yet",
+    "testimonials": "Testimonial moderation",
+    "noTestimonials": "No testimonials yet",
+    "publish": "Publish",
+    "hide": "Hide"
   }
 }
