@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { direct, truncateAll } from "./helpers/db";
-import { createService, updateService, ServiceError } from "@/lib/services";
+import { createService, updateService, deleteService, listServices, ServiceError } from "@/lib/services";
 
 let staffCtx: { userId: string; clinicId: string };
 
@@ -44,5 +44,19 @@ describe("services", () => {
       data: { clinicId: other.id, nameSq: "F", nameEn: "F", durationMin: 30, priceEur: 10 } });
     await expect(updateService(staffCtx, foreign.id, { priceEur: 1 }))
       .rejects.toThrow();
+  });
+  it("deletes a service the staff owns", async () => {
+    const s = await createService(staffCtx, {
+      nameSq: "Heqje", nameEn: "Extraction", durationMin: 45, priceEur: 60 });
+    await deleteService(staffCtx, s.id);
+    const remaining = await listServices(staffCtx);
+    expect(remaining.find((x) => x.id === s.id)).toBeUndefined();
+  });
+  it("cannot delete another clinic's service", async () => {
+    const other = await direct.clinic.create({
+      data: { slug: "svc-other-2", name: "O2", city: "P", address: "x", phone: "x" } });
+    const foreign = await direct.service.create({
+      data: { clinicId: other.id, nameSq: "F2", nameEn: "F2", durationMin: 30, priceEur: 10 } });
+    await expect(deleteService(staffCtx, foreign.id)).rejects.toThrow(ServiceError);
   });
 });
