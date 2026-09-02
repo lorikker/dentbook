@@ -163,5 +163,21 @@
     "profile": "Profili",
     "admin": "Admin",
     "signOut": "Dil"
+  },
+  "About": {
+    "title": "Rreth Dentbook",
+    "intro": "Dentbook lidh pacientët në Kosovë me klinikat dentare për rezervim online.",
+    "teamTitle": "Ekipi ynë"
+  },
+  "Contact": {
+    "title": "Na kontakto",
+    "name": "Emri juaj",
+    "email": "Email",
+    "message": "Mesazhi",
+    "submit": "Dërgo mesazhin",
+    "required": "Ky fushë është e detyrueshme",
+    "invalidEmail": "Jep një adresë email të vlefshme",
+    "success": "Mesazhi juaj u dërgua. Do t'ju përgjigjemi së shpejti.",
+    "error": "Diçka shkoi keq — provo përsëri."
   }
 }
