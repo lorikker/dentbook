@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { withDbContext } from "@/lib/tenant-db";
+import { Card } from "@/components/Card";
 
 export default async function ClinicsPage({
   searchParams,
@@ -31,11 +32,7 @@ export default async function ClinicsPage({
       <ul className="flex flex-col gap-3">
         {clinics.map((c) => (
           <li key={c.id}>
-            <Link href={`/clinics/${c.slug}`}
-                  className="block rounded border p-4 hover:bg-gray-50">
-              <p className="font-semibold">{c.name}</p>
-              <p className="text-sm text-gray-500">{c.city} · {c.address}</p>
-            </Link>
+            <Card href={`/clinics/${c.slug}`} title={c.name} subtitle={`${c.city} · ${c.address}`} />
           </li>
         ))}
       </ul>

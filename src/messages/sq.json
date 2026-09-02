@@ -150,5 +150,16 @@
   },
   "Common": {
     "appName": "Dentbook"
+  },
+  "Header": {
+    "clinics": "Klinikat",
+    "products": "Produktet",
+    "about": "Rreth nesh",
+    "contact": "Kontakt",
+    "login": "Hyr",
+    "register": "Regjistrohu",
+    "profile": "Profili",
+    "admin": "Admin",
+    "signOut": "Dil"
   }
 }

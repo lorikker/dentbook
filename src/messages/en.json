@@ -150,5 +150,16 @@
   },
   "Common": {
     "appName": "Dentbook"
+  },
+  "Header": {
+    "clinics": "Clinics",
+    "products": "Products",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Log in",
+    "register": "Register",
+    "profile": "Profile",
+    "admin": "Admin",
+    "signOut": "Sign out"
   }
 }
