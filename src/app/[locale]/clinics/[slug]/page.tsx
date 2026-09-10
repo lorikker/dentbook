@@ -3,8 +3,14 @@ import { notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
-import { addFavorite, isFavorited, removeFavorite } from "@/lib/favorites";
+import { isFavorited, toggleFavorite } from "@/lib/favorites";
 import { withDbContext } from "@/lib/tenant-db";
+import { Container } from "@/components/Container";
+
+function initialsOf(name: string) {
+  const parts = name.trim().split(/\s+/);
+  return (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
+}
 
 export default async function ClinicProfilePage({
   params,
@@ -18,11 +24,20 @@ export default async function ClinicProfilePage({
         services: { where: { active: true }, orderBy: { nameSq: "asc" } },
         memberships: { where: { role: "DENTIST" },
                        include: { user: true }, orderBy: { createdAt: "asc" } },
+        reviews: { where: { status: "PUBLISHED" }, orderBy: { createdAt: "desc" } },
       },
     }));
   if (!clinic) notFound();
   const about = locale === "en" ? clinic.aboutEn : clinic.aboutSq;
   const clinicId = clinic.id;
+
+  const reviewCount = clinic.reviews.length;
+  const avgRating = reviewCount
+    ? clinic.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+    : null;
+  const minPrice = clinic.services.length
+    ? Math.min(...clinic.services.map((s) => Number(s.priceEur)))
+    : null;
 
   const session = await auth();
   const favorited = session?.user?.id
@@ -33,59 +48,148 @@ export default async function ClinicProfilePage({
     "use server";
     const s = await auth();
     if (!s?.user?.id) return;
-    if (favorited) {
-      await removeFavorite({ userId: s.user.id }, clinicId);
-    } else {
-      await addFavorite({ userId: s.user.id }, clinicId);
-    }
+    // Deliberately not branching on the `favorited` computed above: that value
+    // is from when the page rendered, and a stale tab would take the wrong
+    // branch and 500. toggleFavorite decides from the current row instead.
+    await toggleFavorite({ userId: s.user.id }, clinicId);
     revalidatePath(`/clinics/${slug}`);
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl p-8">
-      <h1 className="text-3xl font-bold" style={{ color: clinic.brandColor }}>
-        {clinic.name}
-      </h1>
-      <p className="mb-1 text-gray-600">{clinic.city} · {clinic.address}</p>
-      <p className="mb-6 text-gray-600">{clinic.phone}</p>
-      {session?.user?.id && (
-        <form action={toggleFavoriteAction} className="mb-6">
-          <button className="rounded border px-4 py-2 text-sm">
-            {favorited ? t("removeFavorite") : t("addFavorite")}
-          </button>
-        </form>
-      )}
-      {about && <p className="mb-8 whitespace-pre-line">{about}</p>}
+    <div className="bg-ink text-cream">
+      <Container className="py-16">
+        <Link href="/clinics" className="text-sm text-muted transition-colors hover:text-cream">
+          ← {t("title")}
+        </Link>
 
-      <h2 className="mb-2 text-xl font-semibold">{t("dentists")}</h2>
-      <ul className="mb-8 flex flex-col gap-2">
-        {clinic.memberships.map((m) => (
-          <li key={m.id} className="rounded border p-3">
-            {/* user can be null only if RLS blocks it — render defensively */}
-            <p className="font-medium">{m.user?.name}{m.title ? ` · ${m.title}` : ""}</p>
-            {m.bio && <p className="text-sm text-gray-500">{m.bio}</p>}
-          </li>
-        ))}
-      </ul>
+        <div className="mt-5 flex flex-wrap items-start justify-between gap-6 border-b border-ink-line pb-7">
+          <div className="flex gap-5">
+            <div className="grid h-20 w-20 shrink-0 place-items-center bg-ink-surface text-2xl font-bold text-accent">
+              {initialsOf(clinic.name)}
+            </div>
+            <div>
+              <h1 className="font-display text-4xl font-bold tracking-tight">{clinic.name}</h1>
+              <p className="mt-2 text-muted">
+                {clinic.city} · {clinic.address}
+              </p>
+              <p className="mt-1 text-muted">{clinic.phone}</p>
+              <p className="mt-2 text-sm text-muted">
+                {avgRating !== null
+                  ? `${avgRating.toFixed(1)} ★ (${reviewCount} ${t("reviews")})`
+                  : t("new")}
+              </p>
+            </div>
+          </div>
 
-      <h2 className="mb-2 text-xl font-semibold">{t("services")}</h2>
-      <ul className="flex flex-col gap-2">
-        {clinic.services.map((s) => (
-          <li key={s.id}
-              className="flex items-center justify-between rounded border p-3">
-            <span>
-              {locale === "en" ? s.nameEn : s.nameSq}
-              <span className="ml-2 text-sm text-gray-500">
-                {s.durationMin} min · {String(s.priceEur)} €
-              </span>
-            </span>
-            <Link href={`/clinics/${clinic.slug}/book?serviceId=${s.id}`}
-                  className="rounded bg-sky-600 px-4 py-2 text-sm text-white">
-              {t("book")}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
+          {session?.user?.id && (
+            <form action={toggleFavoriteAction}>
+              <button
+                className="flex items-center gap-2 border border-ink-line px-4 py-2.5 text-sm font-semibold text-cream transition-colors hover:border-ink-line-hover"
+              >
+                <span className={favorited ? "text-coral" : "text-muted-2"} aria-hidden="true">♥</span>
+                {favorited ? t("removeFavorite") : t("addFavorite")}
+              </button>
+            </form>
+          )}
+        </div>
+
+        <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
+          <div>
+            {about && (
+              <p className="mb-10 max-w-2xl whitespace-pre-line text-muted">{about}</p>
+            )}
+
+            <h2 className="text-[11.5px] font-bold tracking-[0.13em] text-muted-2">
+              {t("dentists").toUpperCase()}
+            </h2>
+            <div className="mt-3.5 grid gap-2.5 sm:grid-cols-2">
+              {clinic.memberships.map((m) => (
+                <div key={m.id} className="border border-ink-line bg-ink-surface p-4">
+                  <p className="font-semibold">
+                    {m.user?.name}
+                    {m.title ? ` · ${m.title}` : ""}
+                  </p>
+                  {m.bio && <p className="mt-1 text-sm text-muted">{m.bio}</p>}
+                </div>
+              ))}
+            </div>
+
+            <h2 className="mt-10 text-[11.5px] font-bold tracking-[0.13em] text-muted-2">
+              {t("services").toUpperCase()}
+            </h2>
+            <div className="mt-3.5 border border-ink-line">
+              {clinic.services.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex flex-wrap items-center justify-between gap-4 border-b border-ink-line bg-ink-surface px-5 py-4 last:border-b-0"
+                >
+                  <span>{locale === "en" ? s.nameEn : s.nameSq}</span>
+                  <span className="flex items-center gap-5">
+                    <span className="text-sm text-muted">{s.durationMin} min</span>
+                    <span className="text-lg font-bold">{String(s.priceEur)} €</span>
+                    <Link
+                      href={`/clinics/${clinic.slug}/book?serviceId=${s.id}`}
+                      className="bg-accent px-4 py-2 text-sm font-bold text-ink transition-colors hover:bg-accent-hover"
+                    >
+                      {t("book")}
+                    </Link>
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {clinic.reviews.length > 0 && (
+              <>
+                <h2 className="mt-10 text-[11.5px] font-bold tracking-[0.13em] text-muted-2">
+                  {t("reviews").toUpperCase()}
+                </h2>
+                <div className="mt-3.5 grid gap-2.5">
+                  {clinic.reviews.map((r) => (
+                    <div key={r.id} className="border border-ink-line bg-ink-surface p-4">
+                      <div className="text-accent">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</div>
+                      {r.comment && <p className="mt-2 text-sm text-muted">{r.comment}</p>}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <aside className="border border-ink-line bg-ink-surface p-5 lg:sticky lg:top-22">
+            {minPrice !== null && (
+              <>
+                <div className="text-[11.5px] font-bold tracking-[0.13em] text-muted-2">
+                  {t("from").toUpperCase()}
+                </div>
+                <div className="mt-1 font-display text-4xl font-bold tracking-tight">
+                  {minPrice}€
+                </div>
+              </>
+            )}
+            {clinic.services[0] && (
+              <Link
+                href={`/clinics/${clinic.slug}/book?serviceId=${clinic.services[0].id}`}
+                className="mt-4 block w-full bg-accent px-4 py-3.5 text-center text-base font-bold text-ink transition-colors hover:bg-accent-hover"
+              >
+                {t("book")}
+              </Link>
+            )}
+            <div className="mt-5 grid gap-2.5 border-t border-ink-line pt-5 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-2">{clinic.city}</span>
+                <span>{clinic.address}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-2">{clinic.phone}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-2">{t("dentists")}</span>
+                <span>{clinic.memberships.length}</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </Container>
+    </div>
   );
 }
