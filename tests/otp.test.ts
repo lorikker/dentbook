@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterAll, vi } from "vitest";
 import { direct, truncateAll } from "./helpers/db";
-import { requestOtp, verifyOtp, OtpError } from "@/lib/otp";
+import { rejectionOf } from "./helpers/rejection";
+import { requestOtp, verifyOtp, pruneOtpCodes, OtpError } from "@/lib/otp";
 // (setup-env.ts already pointed DATABASE_URL at the test DB before imports)
 
 const PHONE = "+38344123456";
@@ -34,6 +35,26 @@ describe("requestOtp", () => {
       await requestOtp(`+3834400000${i}`, "9.9.9.9");
     }
     await expect(requestOtp("+38344999998", "9.9.9.9")).rejects.toThrow(OtpError);
+  });
+});
+
+describe("OTP delivery", () => {
+  it("records every send in the notifications outbox, without the code", async () => {
+    const code = await requestOtpReturningCode(PHONE);
+    const rows = await direct.notification.findMany({ where: { template: "otp_code" } });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ recipient: PHONE, status: "SENT", channel: "SMS" });
+    expect(JSON.stringify(rows[0].payload)).not.toContain(code);
+  });
+
+  it("surfaces a provider failure as SEND_FAILED and records it FAILED", async () => {
+    const broken = { async send(): Promise<{ providerRef: string }> {
+      throw new Error("down"); } };
+    const err = await rejectionOf(requestOtp(PHONE, "1.2.3.4", broken));
+    expect(err).toBeInstanceOf(OtpError);
+    expect((err as OtpError).code).toBe("SEND_FAILED");
+    const row = await direct.notification.findFirstOrThrow({ where: { template: "otp_code" } });
+    expect(row.status).toBe("FAILED");
   });
 });
 
@@ -71,6 +92,21 @@ describe("verifyOtp", () => {
       data: { expiresAt: new Date(Date.now() - 1000) },
     });
     await expect(verifyOtp(PHONE, code, "X")).rejects.toThrow(OtpError);
+  });
+});
+
+describe("pruneOtpCodes", () => {
+  it("deletes codes older than a day and keeps the rest", async () => {
+    const now = new Date("2027-01-10T12:00:00Z");
+    const H = 3600_000;
+    await direct.otpCode.createMany({ data: [
+      { phone: PHONE, codeHash: "old", expiresAt: now,
+        createdAt: new Date(now.getTime() - 25 * H) },
+      { phone: PHONE, codeHash: "recent", expiresAt: now,
+        createdAt: new Date(now.getTime() - 23 * H) },
+    ] });
+    expect(await pruneOtpCodes(now)).toBe(1);
+    expect((await direct.otpCode.findMany()).map((r) => r.codeHash)).toEqual(["recent"]);
   });
 });
 

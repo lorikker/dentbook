@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { direct, truncateAll } from "./helpers/db";
 import { notifyAppointment } from "@/lib/notify";
 
-let appointmentId: string;
+let appointmentId: string, manageToken: string;
 
 beforeAll(async () => {
   await truncateAll();
@@ -24,8 +24,16 @@ beforeAll(async () => {
             startsAt: new Date("2027-01-15T09:00:00Z"),
             endsAt: new Date("2027-01-15T09:30:00Z") } });
   appointmentId = appt.id;
+  manageToken = appt.manageToken;
 });
 afterAll(async () => { await direct.$disconnect(); });
+
+function recorder() {
+  const sent: { to: string; message: string }[] = [];
+  const provider = { async send(to: string, message: string) {
+    sent.push({ to, message }); return { providerRef: `fake-${sent.length}` }; } };
+  return { sent, provider };
+}
 
 describe("notifyAppointment", () => {
   it("writes a SENT outbox row and sends via the provider", async () => {
@@ -46,5 +54,16 @@ describe("notifyAppointment", () => {
     const row = await notifyAppointment("booking_cancelled", appointmentId, broken);
     expect(row?.status).toBe("FAILED");
     expect(row?.sentAt).toBeNull();
+  });
+  it("review invitations link to the review page for this appointment", async () => {
+    const { sent, provider } = recorder();
+    await notifyAppointment("review_invite", appointmentId, provider);
+    expect(sent[0].message).toContain(`/review/${manageToken}`);
+    expect(sent[0].message).not.toContain("/manage/");
+  });
+  it("reminders link to the manage page, where the patient can still change it", async () => {
+    const { sent, provider } = recorder();
+    await notifyAppointment("booking_reminder", appointmentId, provider);
+    expect(sent[0].message).toContain(`/manage/${manageToken}`);
   });
 });

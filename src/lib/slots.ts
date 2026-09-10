@@ -16,13 +16,31 @@ export interface ComputeSlotsInput {
   notBefore?: Date;
 }
 
+/**
+ * Constructing an Intl.DateTimeFormat is orders of magnitude more expensive
+ * than using one, and computeSlots() needs the offset four times per candidate
+ * slot (two wallTimeToUtc calls, two passes each). A single clinic day across
+ * a handful of dentists was building hundreds of identical formatters; there
+ * are only ever a few distinct timezones, so cache them by tz.
+ */
+const offsetFormatters = new Map<string, Intl.DateTimeFormat>();
+
+function offsetFormatter(tz: string): Intl.DateTimeFormat {
+  let fmt = offsetFormatters.get(tz);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz, hourCycle: "h23",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    });
+    offsetFormatters.set(tz, fmt);
+  }
+  return fmt;
+}
+
 /** Offset (ms) of `instant` in `tz`: wall-clock reading minus the instant. */
 function tzOffsetMs(instant: Date, tz: string): number {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: tz, hourCycle: "h23",
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-  }).formatToParts(instant);
+  const parts = offsetFormatter(tz).formatToParts(instant);
   const get = (t: string) => Number(parts.find((p) => p.type === t)!.value);
   const wallAsUtc = Date.UTC(get("year"), get("month") - 1, get("day"),
                              get("hour"), get("minute"), get("second"));

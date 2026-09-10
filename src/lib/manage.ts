@@ -1,6 +1,7 @@
 import { withDbContext } from "./tenant-db";
 import { getAvailableSlots } from "./availability";
 import { isExclusionViolation, clinicLocalDateISO } from "./booking";
+import { settleDepositOnCancel } from "./deposits";
 import { notifyAppointment } from "./notify";
 
 export class ManageError extends Error {
@@ -9,7 +10,8 @@ export class ManageError extends Error {
   }
 }
 
-const ACTIVE: readonly string[] = ["PENDING", "CONFIRMED"];
+/** What a patient may still cancel or move; AWAITING_PAYMENT is an unpaid deposit hold. */
+const ACTIVE: readonly string[] = ["PENDING", "CONFIRMED", "AWAITING_PAYMENT"];
 
 export async function getAppointmentByToken(token: string, now = new Date()) {
   const appt = await withDbContext({ role: "auth" }, (tx) =>
@@ -39,6 +41,8 @@ export async function cancelViaToken(token: string, now = new Date()) {
   const updated = await withDbContext({ role: "auth" }, (tx) =>
     tx.appointment.update({
       where: { id: appt.id }, data: { status: "CANCELLED" } }));
+  await settleDepositOnCancel(
+    { role: "patient", userId: updated.patientUserId }, updated.id);
   await notifyAppointment("booking_cancelled", updated.id);
   return updated;
 }
@@ -59,7 +63,8 @@ export async function rescheduleViaToken(
     const updated = await withDbContext({ role: "auth" }, (tx) =>
       tx.appointment.update({
         where: { id: appt.id },
-        data: { startsAt: slot.startsAt, endsAt: slot.endsAt } }));
+        // any reminder already sent was for the old time
+        data: { startsAt: slot.startsAt, endsAt: slot.endsAt, reminderSentAt: null } }));
     await notifyAppointment("booking_rescheduled", updated.id);
     return updated;
   } catch (e) {

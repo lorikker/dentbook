@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { direct, truncateAll } from "./helpers/db";
 import { acceptAppointment, declineAppointment, cancelAppointmentByStaff,
-         completeAppointment, expireStalePending,
+         completeAppointment, markNoShow, expireStalePending,
          TransitionError } from "@/lib/appointment-actions";
 import type { AppointmentStatus } from "@/generated/prisma/client";
 
@@ -15,6 +15,11 @@ async function makeAppt(status: AppointmentStatus, startsAtZ = "2027-03-05T09:00
             status, startsAt: new Date(startsAtZ),
             endsAt: new Date(new Date(startsAtZ).getTime() + 30 * 60000) } });
 }
+
+const reviewInvitesFor = (appointmentId: string) =>
+  direct.notification.findMany({ where: {
+    template: "review_invite",
+    payload: { path: ["appointmentId"], equals: appointmentId } } });
 
 beforeAll(async () => {
   await truncateAll();
@@ -65,6 +70,21 @@ describe("staff transitions", () => {
   it("cannot touch another clinic's appointment (RLS → NOT_FOUND)", async () => {
     const a = await makeAppt("PENDING", "2027-03-05T13:00:00Z");
     await expect(acceptAppointment(otherCtx, a.id)).rejects.toThrow(TransitionError);
+  });
+});
+
+describe("completion", () => {
+  it("invites the patient to review once the visit is completed", async () => {
+    const a = await makeAppt("CONFIRMED", "2027-03-05T14:00:00Z");
+    await completeAppointment(ctx, a.id);
+    const invites = await reviewInvitesFor(a.id);
+    expect(invites).toHaveLength(1);
+    expect(invites[0].recipient).toBe("+38344900001");
+  });
+  it("sends no review invitation for a no-show", async () => {
+    const a = await makeAppt("CONFIRMED", "2027-03-05T15:00:00Z");
+    await markNoShow(ctx, a.id);
+    expect(await reviewInvitesFor(a.id)).toHaveLength(0);
   });
 });
 

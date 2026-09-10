@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { withDbContext } from "./tenant-db";
 import { getAvailableSlots } from "./availability";
+import { expireUnpaidDeposits } from "./deposits";
 import { logActivity } from "./models/activity-log";
 
 export class BookingError extends Error {
@@ -43,9 +44,15 @@ export async function createBooking(input: BookingInput) {
   const startsAt = new Date(d.startsAtISO);
   if (Number.isNaN(startsAt.getTime())) throw new BookingError("INVALID_INPUT");
 
-  const clinic = await withDbContext({ role: "auth" }, (tx) =>
-    tx.clinic.findUnique({ where: { slug: d.clinicSlug } }));
+  const { clinic, service } = await withDbContext({ role: "auth" }, async (tx) => ({
+    clinic: await tx.clinic.findUnique({ where: { slug: d.clinicSlug } }),
+    service: await tx.service.findUnique({ where: { id: d.serviceId } }),
+  }));
   if (!clinic?.published) throw new BookingError("NOT_FOUND");
+
+  // Abandoned deposit checkouts keep holding their slots until swept; sweep
+  // first so a lapsed hold never blocks a real booking.
+  await expireUnpaidDeposits();
 
   const dateISO = clinicLocalDateISO(startsAt, clinic.timezone);
   const slots = await getAvailableSlots({
@@ -54,6 +61,11 @@ export async function createBooking(input: BookingInput) {
   const slot = slots.find((s) => s.startsAt.getTime() === startsAt.getTime());
   if (!slot) throw new BookingError("SLOT_TAKEN");
 
+  // A deposit service holds the slot until paid; deposits.ts then confirms
+  // it or turns it into a request, per the clinic's booking mode.
+  const status = Number(service?.depositEur ?? 0) > 0 ? "AWAITING_PAYMENT"
+    : clinic.bookingMode === "INSTANT" ? "CONFIRMED" : "PENDING";
+
   try {
     const appt = await withDbContext(
       { role: "auth", userId: d.patientUserId },
@@ -61,8 +73,7 @@ export async function createBooking(input: BookingInput) {
         data: {
           clinicId: clinic.id, membershipId: d.membershipId,
           patientUserId: d.patientUserId, serviceId: d.serviceId,
-          startsAt: slot.startsAt, endsAt: slot.endsAt,
-          status: clinic.bookingMode === "INSTANT" ? "CONFIRMED" : "PENDING",
+          startsAt: slot.startsAt, endsAt: slot.endsAt, status,
         },
       }));
     // Non-fatal: the appointment is already committed, so a Mongo hiccup
@@ -73,7 +84,7 @@ export async function createBooking(input: BookingInput) {
       console.error("logActivity(appointment_booked) failed", e);
     }
     return { appointmentId: appt.id, manageToken: appt.manageToken,
-             status: appt.status as "PENDING" | "CONFIRMED" };
+             status: appt.status as "PENDING" | "CONFIRMED" | "AWAITING_PAYMENT" };
   } catch (e) {
     if (isExclusionViolation(e)) throw new BookingError("SLOT_TAKEN");
     throw e;

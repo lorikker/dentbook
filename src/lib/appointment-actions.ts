@@ -1,5 +1,6 @@
-import { withDbContext } from "./tenant-db";
+import { withDbContext, type DbContext } from "./tenant-db";
 import { notifyAppointment } from "./notify";
+import { settleDepositOnCancel } from "./deposits";
 import type { AppointmentStatus } from "@/generated/prisma/client";
 
 export class TransitionError extends Error {
@@ -38,29 +39,50 @@ export async function acceptAppointment(ctx: StaffCtx, id: string) {
 
 export async function declineAppointment(ctx: StaffCtx, id: string) {
   const a = await transition(ctx, id, "DECLINED");
+  await settleDepositOnCancel(ctxOf(ctx), a.id);
   await notifyAppointment("booking_declined", a.id);
   return a;
 }
 
 export async function cancelAppointmentByStaff(ctx: StaffCtx, id: string) {
   const a = await transition(ctx, id, "CANCELLED");
+  await settleDepositOnCancel(ctxOf(ctx), a.id);
   await notifyAppointment("booking_cancelled", a.id);
   return a;
 }
 
 export async function completeAppointment(ctx: StaffCtx, id: string) {
-  return transition(ctx, id, "COMPLETED");
+  const a = await transition(ctx, id, "COMPLETED");
+  // Spec §8: completion sends the review link — reviews are verified-only.
+  await notifyAppointment("review_invite", a.id);
+  return a;
 }
 
 export async function markNoShow(ctx: StaffCtx, id: string) {
   return transition(ctx, id, "NO_SHOW");
 }
 
+async function expirePending(dbCtx: DbContext, clinicId: string | undefined, now: Date) {
+  const stale = await withDbContext(dbCtx, (tx) =>
+    tx.appointment.findMany({
+      where: { ...(clinicId ? { clinicId } : {}), status: "PENDING",
+               startsAt: { lt: now } },
+      select: { id: true } }));
+  if (stale.length === 0) return { count: 0 };
+  const ids = stale.map((a) => a.id);
+  const result = await withDbContext(dbCtx, (tx) =>
+    tx.appointment.updateMany({
+      where: { id: { in: ids }, status: "PENDING" }, data: { status: "DECLINED" } }));
+  for (const id of ids) await settleDepositOnCancel(dbCtx, id);
+  return result;
+}
+
 /** Pending requests whose start passed without a decision expire as DECLINED. */
 export async function expireStalePending(ctx: StaffCtx, now = new Date()) {
-  return withDbContext(ctxOf(ctx), (tx) =>
-    tx.appointment.updateMany({
-      where: { clinicId: ctx.clinicId, status: "PENDING", startsAt: { lt: now } },
-      data: { status: "DECLINED" },
-    }));
+  return expirePending(ctxOf(ctx), ctx.clinicId, now);
+}
+
+/** The same sweep across every clinic, for the scheduled job. */
+export async function expireStalePendingForAllClinics(now = new Date()) {
+  return expirePending({ role: "admin" }, undefined, now);
 }
