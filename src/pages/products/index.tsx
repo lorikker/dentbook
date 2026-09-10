@@ -47,24 +47,26 @@ export default function ProductsPage({
       <Head>
         <title>Products · Dentbook</title>
       </Head>
-      <PagesNav />
-      <main className="mx-auto w-full max-w-3xl p-8">
-        <h1 className="mb-6 text-3xl font-bold">Products</h1>
-        {services.length === 0 ? (
-          <p className="text-gray-500">No products found.</p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {services.map((s) => (
-              <Card
-                key={s.id}
-                href={`/products/${s.id}`}
-                title={s.nameEn}
-                subtitle={`${s.clinicName} · ${s.priceEur} €`}
-              />
-            ))}
-          </div>
-        )}
-      </main>
+      <div className="min-h-screen bg-ink text-cream">
+        <PagesNav />
+        <main className="mx-auto w-full max-w-3xl p-8">
+          <h1 className="font-display text-4xl font-bold tracking-tight">Products</h1>
+          {services.length === 0 ? (
+            <p className="mt-8 text-muted">No products found.</p>
+          ) : (
+            <div className="mt-8 flex flex-col gap-2.5">
+              {services.map((s) => (
+                <Card
+                  key={s.id}
+                  href={`/products/${s.id}`}
+                  title={s.nameEn}
+                  subtitle={`${s.clinicName} · ${s.priceEur} €`}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
     </>
   );
 }

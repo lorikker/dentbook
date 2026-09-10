@@ -73,17 +73,19 @@ export default function ProductDetailPage({
       <Head>
         <title>{nameEn} · Dentbook</title>
       </Head>
-      <PagesNav />
-      <main className="mx-auto w-full max-w-2xl p-8">
-        <h1 className="mb-2 text-3xl font-bold">{nameEn}</h1>
-        <p className="mb-6 text-gray-600">
-          {durationMin} min · {priceEur} €
-        </p>
-        <Card title={clinicName} subtitle={clinicCity} />
-        <div className="mt-6">
-          <ButtonLink href={`/clinics/${clinicSlug}`}>View clinic</ButtonLink>
-        </div>
-      </main>
+      <div className="min-h-screen bg-ink text-cream">
+        <PagesNav />
+        <main className="mx-auto w-full max-w-2xl p-8">
+          <h1 className="font-display text-4xl font-bold tracking-tight">{nameEn}</h1>
+          <p className="mt-2 mb-8 text-muted">
+            {durationMin} min · {priceEur} €
+          </p>
+          <Card title={clinicName} subtitle={clinicCity} />
+          <div className="mt-6">
+            <ButtonLink href={`/clinics/${clinicSlug}`}>View clinic</ButtonLink>
+          </div>
+        </main>
+      </div>
     </>
   );
 }

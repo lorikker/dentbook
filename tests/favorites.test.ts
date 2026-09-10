@@ -5,6 +5,7 @@ import {
   removeFavorite,
   listFavoriteClinics,
   isFavorited,
+  toggleFavorite,
   FavoriteError,
 } from "@/lib/favorites";
 
@@ -64,5 +65,37 @@ describe("favorites", () => {
   it("does not leak another user's favorites (RLS)", async () => {
     const clinics = await listFavoriteClinics(userB);
     expect(clinics).toEqual([]);
+  });
+});
+
+describe("toggleFavorite", () => {
+  it("adds when absent and reports the new state", async () => {
+    expect(await isFavorited(userB, clinic1.id)).toBe(false);
+    expect(await toggleFavorite(userB, clinic1.id)).toEqual({ favorited: true });
+    expect(await isFavorited(userB, clinic1.id)).toBe(true);
+  });
+
+  it("removes when present and reports the new state", async () => {
+    expect(await toggleFavorite(userB, clinic1.id)).toEqual({ favorited: false });
+    expect(await isFavorited(userB, clinic1.id)).toBe(false);
+  });
+
+  // The clinic page used to branch on the favourited flag captured at render
+  // time, so a tab that went stale sent "add" for an already-favourited clinic
+  // and got an unhandled ALREADY_FAVORITED (a 500). Toggling decides from the
+  // current row, so repeating the same stale intent is safe.
+  it("is safe to call repeatedly from a stale page", async () => {
+    await toggleFavorite(userB, clinic2.id); // favourited elsewhere
+    expect(await isFavorited(userB, clinic2.id)).toBe(true);
+
+    // A stale tab still believing it is unfavourited fires the same action.
+    await expect(toggleFavorite(userB, clinic2.id)).resolves.toEqual({ favorited: false });
+    await expect(toggleFavorite(userB, clinic2.id)).resolves.toEqual({ favorited: true });
+  });
+
+  it("keeps toggles scoped to the acting user", async () => {
+    const before = await listFavoriteClinics(userA);
+    await toggleFavorite(userB, clinic1.id);
+    expect(await listFavoriteClinics(userA)).toEqual(before);
   });
 });

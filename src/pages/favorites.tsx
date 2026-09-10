@@ -44,26 +44,31 @@ export default function FavoritesPage({
       <Head>
         <title>Favorites · Dentbook</title>
       </Head>
-      <PagesNav />
-      <main className="mx-auto w-full max-w-3xl p-8">
-        <h1 className="mb-6 text-3xl font-bold">Favorites</h1>
-        {clinics.length === 0 ? (
-          <p className="text-gray-500">
-            You haven&apos;t favorited any clinics yet.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {clinics.map((c) => (
-              <Card
-                key={c.id}
-                href={`/clinics/${c.slug}`}
-                title={c.name}
-                subtitle={`${c.city} · ${c.address}`}
-              />
-            ))}
-          </div>
-        )}
-      </main>
+      <div className="min-h-screen bg-ink text-cream">
+        <PagesNav />
+        <main className="mx-auto w-full max-w-3xl p-8">
+          <h1 className="font-display text-4xl font-bold tracking-tight">Favorites</h1>
+          {clinics.length === 0 ? (
+            <div className="mt-8 border border-dashed border-ink-line p-14 text-center">
+              <p className="text-lg font-semibold">Nothing saved yet</p>
+              <p className="mt-2 text-muted">
+                You haven&apos;t favorited any clinics yet.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-8 flex flex-col gap-2.5">
+              {clinics.map((c) => (
+                <Card
+                  key={c.id}
+                  href={`/clinics/${c.slug}`}
+                  title={c.name}
+                  subtitle={`${c.city} · ${c.address}`}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
     </>
   );
 }
