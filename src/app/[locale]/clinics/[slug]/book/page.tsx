@@ -9,6 +9,7 @@ import { createBooking, BookingError, clinicLocalDateISO } from "@/lib/booking";
 import { rescheduleViaToken, ManageError } from "@/lib/manage";
 import { requestOtp, OtpError } from "@/lib/otp";
 import { notifyAppointment } from "@/lib/notify";
+import { startDeposit, expireUnpaidDeposits, DEPOSIT_HOLD_MINUTES } from "@/lib/deposits";
 import { Container } from "@/components/Container";
 
 type Query = {
@@ -96,10 +97,16 @@ export default async function BookPage({
         clinicSlug: f("slug"), serviceId: f("serviceId"),
         membershipId: f("membershipId"), patientUserId: userId!,
         startsAtISO: f("startsAt") });
-      await notifyAppointment(
-        r.status === "CONFIRMED" ? "booking_confirmed" : "booking_pending",
-        r.appointmentId);
-      dest = `/manage/${r.manageToken}?booked=1`;
+      if (r.status === "AWAITING_PAYMENT") {
+        // No SMS yet: the confirmation goes out once the deposit is paid.
+        const checkout = await startDeposit(r.appointmentId);
+        dest = checkout?.checkoutUrl ?? `/manage/${r.manageToken}`;
+      } else {
+        await notifyAppointment(
+          r.status === "CONFIRMED" ? "booking_confirmed" : "booking_pending",
+          r.appointmentId);
+        dest = `/manage/${r.manageToken}?booked=1`;
+      }
     } catch (e) {
       redirect(`${back}&error=${e instanceof BookingError ? e.code : "UNKNOWN"}`);
     }
@@ -170,6 +177,8 @@ export default async function BookPage({
     step = 3;
     // step 3: browse every free slot in the next 14 days, or narrow to one
     // day with the date filter (a GET form back onto this same page).
+    // Abandoned deposit checkouts release their slots first.
+    await expireUnpaidDeposits();
     const slotLink = (s: { startsAt: Date; membershipId: string }) => (
       <Link key={`${s.membershipId}-${s.startsAt.toISOString()}`}
             href={keep({ startsAt: s.startsAt.toISOString(),
@@ -258,10 +267,18 @@ export default async function BookPage({
     const back = keep({});
     const when = format.dateTime(new Date(q.startsAt), {
       dateStyle: "medium", timeStyle: "short", timeZone: clinic.timezone });
+    const deposit = Number(service.depositEur ?? 0);
     const summary = (
       <div className="mb-5 border border-ink-line bg-ink-surface p-5">
         <div className="text-sm text-muted">{sName(service)}</div>
         <div className="mt-1 font-display text-3xl font-bold tracking-tight">{when}</div>
+        {deposit > 0 && !q.reschedule && (
+          <p className="mt-3 border-t border-ink-line pt-3 text-sm text-muted">
+            {t("depositNotice", {
+              amount: format.number(deposit, { style: "currency", currency: "EUR" }),
+              minutes: DEPOSIT_HOLD_MINUTES })}
+          </p>
+        )}
       </div>
     );
     if (q.reschedule) {
@@ -297,7 +314,9 @@ export default async function BookPage({
                        className={`${inputClass} text-center tracking-[0.3em]`} />
               </>
             )}
-            <button className={primaryBtnClass}>{t("confirm")}</button>
+            <button className={primaryBtnClass}>
+              {deposit > 0 ? t("continueToPayment") : t("confirm")}
+            </button>
           </form>
         </div>
       );
