@@ -25,6 +25,7 @@ enum AppointmentStatus {
   CANCELLED
   COMPLETED
   NO_SHOW
+  AWAITING_PAYMENT // deposit hold: blocks the slot until the patient pays
 }
 
 enum ReviewStatus {
@@ -112,6 +113,8 @@ model Clinic {
   notifications           Notification[]
   favorites               Favorite[]
 
+  @@index([published, city])
+  @@index([published, createdAt])
   @@map("clinics")
 }
 
@@ -132,6 +135,8 @@ model Membership {
   appointments Appointment[]
 
   @@unique([userId, clinicId])
+  @@index([clinicId, role])
+  @@index([clinicId, createdAt])
   @@map("memberships")
 }
 
@@ -148,6 +153,7 @@ model Service {
   dentists     DentistService[]
   appointments Appointment[]
 
+  @@index([clinicId, active])
   @@map("services")
 }
 
@@ -158,6 +164,7 @@ model DentistService {
   service      Service    @relation(fields: [serviceId], references: [id])
 
   @@id([membershipId, serviceId])
+  @@index([serviceId])
   @@map("dentist_services")
 }
 
@@ -169,6 +176,7 @@ model Schedule {
   endMin       Int        @map("end_min")
   membership   Membership @relation(fields: [membershipId], references: [id])
 
+  @@index([membershipId])
   @@map("schedules")
 }
 
@@ -183,6 +191,8 @@ model ScheduleException {
   clinic       Clinic      @relation(fields: [clinicId], references: [id])
   membership   Membership? @relation(fields: [membershipId], references: [id])
 
+  @@index([clinicId, date])
+  @@index([membershipId])
   @@map("schedule_exceptions")
 }
 
@@ -197,6 +207,7 @@ model Appointment {
   status        AppointmentStatus
   notes         String?
   manageToken   String            @unique @default(uuid()) @map("manage_token")
+  reminderSentAt DateTime?         @map("reminder_sent_at") // set once the 24h reminder is claimed
   createdAt     DateTime          @default(now()) @map("created_at")
   clinic        Clinic            @relation(fields: [clinicId], references: [id])
   membership    Membership        @relation(fields: [membershipId], references: [id])
@@ -205,6 +216,12 @@ model Appointment {
   review        Review?
   payment       Payment?
 
+  @@index([clinicId, startsAt])
+  @@index([clinicId, status, startsAt])
+  @@index([membershipId, startsAt])
+  @@index([status, startsAt])
+  @@index([patientUserId])
+  @@index([serviceId])
   @@map("appointments")
 }
 
@@ -221,6 +238,8 @@ model Review {
   patient       User         @relation(fields: [patientUserId], references: [id])
   appointment   Appointment  @relation(fields: [appointmentId], references: [id])
 
+  @@index([clinicId, status])
+  @@index([patientUserId])
   @@map("reviews")
 }
 
@@ -233,6 +252,7 @@ model Favorite {
   clinic    Clinic   @relation(fields: [clinicId], references: [id])
 
   @@unique([userId, clinicId])
+  @@index([clinicId])
   @@map("favorites")
 }
 
@@ -248,6 +268,7 @@ model Payment {
   clinic        Clinic        @relation(fields: [clinicId], references: [id])
   appointment   Appointment?  @relation(fields: [appointmentId], references: [id])
 
+  @@index([clinicId])
   @@map("payments")
 }
 
@@ -274,6 +295,7 @@ model Invoice {
   paidAt         DateTime?     @map("paid_at")
   subscription   Subscription  @relation(fields: [subscriptionId], references: [id])
 
+  @@index([subscriptionId])
   @@map("invoices")
 }
 
@@ -287,7 +309,8 @@ model OtpCode {
   requestIp  String?   @map("request_ip")
   createdAt  DateTime  @default(now()) @map("created_at")
 
-  @@index([phone])
+  @@index([phone, createdAt])
+  @@index([requestIp, createdAt])
   @@map("otp_codes")
 }
 
@@ -304,5 +327,6 @@ model Notification {
   providerRef String?             @map("provider_ref")
   clinic      Clinic?             @relation(fields: [clinicId], references: [id])
 
+  @@index([clinicId])
   @@map("notifications")
 }
