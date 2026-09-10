@@ -31,8 +31,6 @@
       }
     },
     "steps": {
-      "kicker": "How it works",
-      "title": "Three steps, no phone call",
       "1": {
         "title": "Pick the tooth",
         "body": "Tap the tooth on the chart or browse clinics directly — we don't need an account to get started."
@@ -44,7 +42,9 @@
       "3": {
         "title": "Confirm by SMS",
         "body": "Enter your number, type the six-digit code, and you're booked. The clinic sees it instantly."
-      }
+      },
+      "kicker": "How it works",
+      "title": "Three steps, no phone call"
     },
     "featured": {
       "kicker": "Featured clinics",
@@ -60,6 +60,10 @@
       "title": "List your clinic and fill the gaps in your calendar.",
       "body": "Publish your services and open hours for free. You approve every request from your own dashboard.",
       "button": "Register your clinic"
+    },
+    "testimonials": {
+      "kicker": "Patients say",
+      "title": "In their own words"
     }
   },
   "Login": {
@@ -72,9 +76,27 @@
   "Register": {
     "title": "Register your clinic",
     "submit": "Sign up",
-    "fields": { "ownerName": "Your name", "email": "Email", "password": "Password",
-      "clinicName": "Clinic name", "city": "City", "address": "Address", "phone": "Phone" },
-    "errors": { "INVALID_INPUT": "Invalid input", "EMAIL_TAKEN": "This email is already taken", "UNKNOWN": "Unexpected error" }
+    "fields": {
+      "ownerName": "Your name",
+      "email": "Email",
+      "password": "Password",
+      "clinicName": "Clinic name",
+      "city": "City",
+      "address": "Address",
+      "phone": "Phone"
+    },
+    "errors": {
+      "INVALID_INPUT": "Invalid input",
+      "NAME_TOO_SHORT": "Your name must be at least 2 characters",
+      "INVALID_EMAIL": "Enter a valid email address",
+      "PASSWORD_TOO_SHORT": "Password must be at least 8 characters",
+      "CLINIC_NAME_TOO_SHORT": "Clinic name must be at least 2 characters",
+      "CITY_TOO_SHORT": "City must be at least 2 characters",
+      "ADDRESS_TOO_SHORT": "Address must be at least 2 characters",
+      "PHONE_TOO_SHORT": "Enter a valid phone number",
+      "EMAIL_TAKEN": "This email is already taken",
+      "UNKNOWN": "Unexpected error"
+    }
   },
   "Auth": {
     "loginTab": "Log in",
@@ -122,7 +144,11 @@
       "email": "Email",
       "tempPassword": "Temporary password",
       "titleField": "Title (e.g. Dr. med. dent.)",
-      "roles": { "DENTIST": "Dentist", "RECEPTIONIST": "Receptionist", "OWNER": "Owner" },
+      "roles": {
+        "DENTIST": "Dentist",
+        "RECEPTIONIST": "Receptionist",
+        "OWNER": "Owner"
+      },
       "addTitle": "Add staff member",
       "add": "Add"
     },
@@ -138,7 +164,15 @@
       "closed": "Closed",
       "exceptionHint": "For altered hours untick 'Closed' and provide the times.",
       "add": "Add",
-      "weekdays": { "0": "Sunday", "1": "Monday", "2": "Tuesday", "3": "Wednesday", "4": "Thursday", "5": "Friday", "6": "Saturday" }
+      "weekdays": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      }
     },
     "settings": {
       "title": "Clinic settings",
@@ -150,9 +184,21 @@
       "aboutEn": "About (English)",
       "brandColor": "Brand color",
       "bookingMode": "Booking mode",
-      "modes": { "INSTANT": "Instant booking", "APPROVAL": "Requires approval" },
+      "modes": {
+        "INSTANT": "Instant booking",
+        "APPROVAL": "Requires approval"
+      },
       "cancellationWindow": "Cancellation window (hours)",
       "save": "Save"
+    },
+    "complete": "Mark completed",
+    "noShow": "No-show",
+    "awaitingOutcome": "Past appointments awaiting outcome",
+    "depositPaid": "Deposit paid",
+    "depositPending": "Deposit pending",
+    "billing": {
+      "pastDue": "Your Dentbook subscription has an overdue invoice. Please contact us to settle it.",
+      "trialEnds": "Free trial until {date}"
     }
   },
   "Book": {
@@ -182,8 +228,11 @@
       "NOT_ACTIVE": "This appointment is no longer active",
       "NOT_FOUND": "Appointment not found",
       "INVALID_INPUT": "Invalid input",
-      "UNKNOWN": "Unexpected error"
-    }
+      "UNKNOWN": "Unexpected error",
+      "SEND_FAILED": "We couldn't send the SMS — check the number and try again"
+    },
+    "depositNotice": "This treatment needs a {amount} deposit to confirm. You'll pay it on the next screen — the slot is held for {minutes} minutes.",
+    "continueToPayment": "Continue to payment"
   },
   "Clinics": {
     "title": "Clinics",
@@ -197,7 +246,11 @@
     "removeFavorite": "Remove from favorites",
     "searchPlaceholder": "Search by name",
     "sortBy": "Sort by",
-    "sort": { "name": "Name", "rating": "Rating", "price": "Price" },
+    "sort": {
+      "name": "Name",
+      "rating": "Rating",
+      "price": "Price"
+    },
     "maxPrice": "Max price",
     "priceAny": "Any price",
     "priceUnder": "Under {amount}€",
@@ -222,7 +275,8 @@
       "DECLINED": "Declined",
       "CANCELLED": "Cancelled",
       "COMPLETED": "Completed",
-      "NO_SHOW": "No-show"
+      "NO_SHOW": "No-show",
+      "AWAITING_PAYMENT": "Awaiting deposit"
     },
     "errors": {
       "WINDOW_PASSED": "The cancellation window has passed",
@@ -230,7 +284,15 @@
       "NOT_FOUND": "Appointment not found",
       "SLOT_TAKEN": "The new slot was just taken",
       "UNKNOWN": "Unexpected error"
-    }
+    },
+    "deposit": "Deposit {amount}",
+    "depositStatus": {
+      "PENDING": "not paid yet",
+      "SUCCEEDED": "paid",
+      "FAILED": "not paid",
+      "REFUNDED": "refunded"
+    },
+    "payNow": "Pay deposit"
   },
   "Common": {
     "appName": "Dentbook"
@@ -242,6 +304,7 @@
     "contact": "Contact",
     "login": "Log in",
     "register": "Register",
+    "listClinic": "List your clinic",
     "profile": "Profile",
     "admin": "Admin",
     "signOut": "Sign out"
@@ -249,7 +312,16 @@
   "About": {
     "title": "About Dentbook",
     "intro": "Dentbook connects patients in Kosovo with dental clinics for online booking.",
-    "teamTitle": "Our team"
+    "teamTitle": "Our team",
+    "shareTitle": "Share your experience",
+    "shareIntro": "Booked through Dentbook? Tell others how it went. Testimonials appear after a quick review.",
+    "name": "Your name",
+    "role": "Who you are (optional, e.g. patient in Prishtina)",
+    "quote": "Your experience",
+    "submit": "Send",
+    "thanks": "Thank you! Your testimonial will appear once it's approved.",
+    "invalid": "Please add your name and 10–500 characters about your experience.",
+    "failed": "Something went wrong — please try again later."
   },
   "Contact": {
     "title": "Contact us",
@@ -272,7 +344,18 @@
     "testimonials": "Testimonial moderation",
     "noTestimonials": "No testimonials yet",
     "publish": "Publish",
-    "hide": "Hide"
+    "hide": "Hide",
+    "reviews": "Review moderation",
+    "noReviews": "No reviews yet",
+    "hidden": "Hidden",
+    "subscriptions": "Subscriptions",
+    "trialEnds": "Trial ends",
+    "periodEnd": "Paid through",
+    "markPaid": "Mark paid",
+    "setPlan": "Set plan",
+    "runJobs": "Run scheduled jobs now",
+    "runJobsHint": "Reminders, deposit holds, request expiry, billing rollover and OTP cleanup. Also runs automatically every day.",
+    "jobsRan": "Scheduled jobs ran: {ok} of {total} succeeded."
   },
   "Profile": {
     "title": "Your profile",
@@ -282,5 +365,34 @@
     "save": "Save",
     "success": "Profile updated",
     "error": "Something went wrong"
+  },
+  "Pay": {
+    "testMode": "TEST MODE",
+    "title": "Pay your deposit",
+    "subtitle": "Your slot is held for {minutes} minutes while you pay.",
+    "deposit": "Deposit",
+    "pay": "Pay {amount}",
+    "cancel": "Cancel and release the slot",
+    "released": "This payment was cancelled and the slot has been released.",
+    "refunded": "Your payment arrived after the hold expired, so it has been refunded.",
+    "bookAgain": "Book again",
+    "mockNote": "Dentbook uses a mock payment provider in this environment: no card is charged and no money moves."
+  },
+  "Review": {
+    "title": "How was your visit?",
+    "ratingLabel": "Your rating",
+    "commentLabel": "Comment (optional)",
+    "commentPlaceholder": "What went well? What could be better?",
+    "submit": "Submit review",
+    "thanks": "Thank you — your review is published.",
+    "stars": "{count} out of 5 stars",
+    "notYet": "Reviews open once your visit is completed.",
+    "errors": {
+      "INVALID_INPUT": "Please pick a rating from 1 to 5 (comments up to 1000 characters).",
+      "NOT_COMPLETED": "Reviews open once your visit is completed.",
+      "ALREADY_REVIEWED": "You've already reviewed this visit.",
+      "NOT_FOUND": "This review link isn't valid.",
+      "UNKNOWN": "Unexpected error"
+    }
   }
 }

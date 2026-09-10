@@ -31,8 +31,6 @@
       }
     },
     "steps": {
-      "kicker": "Si funksionon",
-      "title": "Tri hapa, pa asnjë telefonatë",
       "1": {
         "title": "Zgjidh dhëmbin",
         "body": "Prek dhëmbin në skemë ose shfleto klinikat drejtpërdrejt — nuk nevojitet llogari për të filluar."
@@ -44,7 +42,9 @@
       "3": {
         "title": "Konfirmo me SMS",
         "body": "Jep numrin tënd, shkruaj kodin gjashtëshifror, dhe termini u konfirmua. Klinika e sheh menjëherë."
-      }
+      },
+      "kicker": "Si funksionon",
+      "title": "Tri hapa, pa asnjë telefonatë"
     },
     "featured": {
       "kicker": "Klinika të veçuara",
@@ -60,6 +60,10 @@
       "title": "Regjistro klinikën tënde dhe mbush boshllëqet në kalendar.",
       "body": "Publiko shërbimet dhe oraret e lira falas. Aprovon çdo kërkesë nga paneli yt.",
       "button": "Regjistro klinikën"
+    },
+    "testimonials": {
+      "kicker": "Çfarë thonë pacientët",
+      "title": "Me fjalët e tyre"
     }
   },
   "Login": {
@@ -72,9 +76,27 @@
   "Register": {
     "title": "Regjistro klinikën tënde",
     "submit": "Regjistrohu",
-    "fields": { "ownerName": "Emri juaj", "email": "Email", "password": "Fjalëkalimi",
-      "clinicName": "Emri i klinikës", "city": "Qyteti", "address": "Adresa", "phone": "Telefoni" },
-    "errors": { "INVALID_INPUT": "Të dhëna të pavlefshme", "EMAIL_TAKEN": "Ky email është i zënë", "UNKNOWN": "Gabim i papritur" }
+    "fields": {
+      "ownerName": "Emri juaj",
+      "email": "Email",
+      "password": "Fjalëkalimi",
+      "clinicName": "Emri i klinikës",
+      "city": "Qyteti",
+      "address": "Adresa",
+      "phone": "Telefoni"
+    },
+    "errors": {
+      "INVALID_INPUT": "Të dhëna të pavlefshme",
+      "NAME_TOO_SHORT": "Emri juaj duhet të ketë të paktën 2 shkronja",
+      "INVALID_EMAIL": "Vendos një adresë email të vlefshme",
+      "PASSWORD_TOO_SHORT": "Fjalëkalimi duhet të ketë të paktën 8 shkronja",
+      "CLINIC_NAME_TOO_SHORT": "Emri i klinikës duhet të ketë të paktën 2 shkronja",
+      "CITY_TOO_SHORT": "Qyteti duhet të ketë të paktën 2 shkronja",
+      "ADDRESS_TOO_SHORT": "Adresa duhet të ketë të paktën 2 shkronja",
+      "PHONE_TOO_SHORT": "Vendos një numër telefoni të vlefshëm",
+      "EMAIL_TAKEN": "Ky email është i zënë",
+      "UNKNOWN": "Gabim i papritur"
+    }
   },
   "Auth": {
     "loginTab": "Hyr",
@@ -122,7 +144,11 @@
       "email": "Email",
       "tempPassword": "Fjalëkalimi i përkohshëm",
       "titleField": "Titulli (p.sh. Dr. med. dent.)",
-      "roles": { "DENTIST": "Dentist", "RECEPTIONIST": "Recepsionist", "OWNER": "Pronar" },
+      "roles": {
+        "DENTIST": "Dentist",
+        "RECEPTIONIST": "Recepsionist",
+        "OWNER": "Pronar"
+      },
       "addTitle": "Shto anëtar stafi",
       "add": "Shto"
     },
@@ -138,7 +164,15 @@
       "closed": "Mbyllur",
       "exceptionHint": "Për orar të ndryshuar hiqe shenjën te 'Mbyllur' dhe jep orët.",
       "add": "Shto",
-      "weekdays": { "0": "E diel", "1": "E hënë", "2": "E martë", "3": "E mërkurë", "4": "E enjte", "5": "E premte", "6": "E shtunë" }
+      "weekdays": {
+        "0": "E diel",
+        "1": "E hënë",
+        "2": "E martë",
+        "3": "E mërkurë",
+        "4": "E enjte",
+        "5": "E premte",
+        "6": "E shtunë"
+      }
     },
     "settings": {
       "title": "Cilësimet e klinikës",
@@ -150,9 +184,21 @@
       "aboutEn": "Përshkrimi (anglisht)",
       "brandColor": "Ngjyra e brendit",
       "bookingMode": "Mënyra e rezervimit",
-      "modes": { "INSTANT": "Rezervim i menjëhershëm", "APPROVAL": "Me aprovim" },
+      "modes": {
+        "INSTANT": "Rezervim i menjëhershëm",
+        "APPROVAL": "Me aprovim"
+      },
       "cancellationWindow": "Afati i anulimit (orë)",
       "save": "Ruaj"
+    },
+    "complete": "Shëno si të përfunduar",
+    "noShow": "Nuk u paraqit",
+    "awaitingOutcome": "Termine të kaluara pa rezultat",
+    "depositPaid": "Depozita e paguar",
+    "depositPending": "Depozita në pritje",
+    "billing": {
+      "pastDue": "Abonimi juaj në Dentbook ka një faturë të vonuar. Ju lutemi na kontaktoni për ta shlyer.",
+      "trialEnds": "Provë falas deri më {date}"
     }
   },
   "Book": {
@@ -182,8 +228,11 @@
       "NOT_ACTIVE": "Ky termin nuk është më aktiv",
       "NOT_FOUND": "Termini nuk u gjet",
       "INVALID_INPUT": "Të dhëna të pavlefshme",
-      "UNKNOWN": "Gabim i papritur"
-    }
+      "UNKNOWN": "Gabim i papritur",
+      "SEND_FAILED": "SMS-ja nuk u dërgua — kontrolloni numrin dhe provoni përsëri"
+    },
+    "depositNotice": "Ky trajtim kërkon një depozitë prej {amount} për t'u konfirmuar. Do ta paguani në hapin tjetër — orari mbahet i rezervuar për {minutes} minuta.",
+    "continueToPayment": "Vazhdo te pagesa"
   },
   "Clinics": {
     "title": "Klinikat",
@@ -197,7 +246,11 @@
     "removeFavorite": "Hiq nga të preferuarat",
     "searchPlaceholder": "Kërko sipas emrit",
     "sortBy": "Rendit sipas",
-    "sort": { "name": "Emri", "rating": "Vlerësimi", "price": "Çmimi" },
+    "sort": {
+      "name": "Emri",
+      "rating": "Vlerësimi",
+      "price": "Çmimi"
+    },
     "maxPrice": "Çmimi maksimal",
     "priceAny": "Çdo çmim",
     "priceUnder": "Nën {amount}€",
@@ -222,7 +275,8 @@
       "DECLINED": "I refuzuar",
       "CANCELLED": "I anuluar",
       "COMPLETED": "I përfunduar",
-      "NO_SHOW": "Nuk u paraqit"
+      "NO_SHOW": "Nuk u paraqit",
+      "AWAITING_PAYMENT": "Në pritje të depozitës"
     },
     "errors": {
       "WINDOW_PASSED": "Afati i anulimit ka kaluar",
@@ -230,7 +284,15 @@
       "NOT_FOUND": "Termini nuk u gjet",
       "SLOT_TAKEN": "Orari i ri sapo u zu",
       "UNKNOWN": "Gabim i papritur"
-    }
+    },
+    "deposit": "Depozita {amount}",
+    "depositStatus": {
+      "PENDING": "ende e papaguar",
+      "SUCCEEDED": "e paguar",
+      "FAILED": "e papaguar",
+      "REFUNDED": "e rimbursuar"
+    },
+    "payNow": "Paguaj depozitën"
   },
   "Common": {
     "appName": "Dentbook"
@@ -242,6 +304,7 @@
     "contact": "Kontakt",
     "login": "Hyr",
     "register": "Regjistrohu",
+    "listClinic": "Regjistro klinikën",
     "profile": "Profili",
     "admin": "Admin",
     "signOut": "Dil"
@@ -249,7 +312,16 @@
   "About": {
     "title": "Rreth Dentbook",
     "intro": "Dentbook lidh pacientët në Kosovë me klinikat dentare për rezervim online.",
-    "teamTitle": "Ekipi ynë"
+    "teamTitle": "Ekipi ynë",
+    "shareTitle": "Ndani përvojën tuaj",
+    "shareIntro": "Keni rezervuar përmes Dentbook? Tregojuni të tjerëve si shkoi. Dëshmitë shfaqen pas një kontrolli të shkurtër.",
+    "name": "Emri juaj",
+    "role": "Kush jeni (opsionale, p.sh. paciente në Prishtinë)",
+    "quote": "Përvoja juaj",
+    "submit": "Dërgo",
+    "thanks": "Faleminderit! Dëshmia juaj do të shfaqet pasi të aprovohet.",
+    "invalid": "Shkruani emrin dhe 10–500 karaktere për përvojën tuaj.",
+    "failed": "Diçka shkoi keq — provoni përsëri më vonë."
   },
   "Contact": {
     "title": "Na kontakto",
@@ -272,7 +344,18 @@
     "testimonials": "Moderimi i dëshmive",
     "noTestimonials": "Ende nuk ka dëshmi",
     "publish": "Publiko",
-    "hide": "Fshih"
+    "hide": "Fshih",
+    "reviews": "Moderimi i vlerësimeve",
+    "noReviews": "Ende nuk ka vlerësime",
+    "hidden": "E fshehur",
+    "subscriptions": "Abonimet",
+    "trialEnds": "Prova mbaron",
+    "periodEnd": "E paguar deri më",
+    "markPaid": "Shëno si të paguar",
+    "setPlan": "Cakto planin",
+    "runJobs": "Ekzekuto punët e planifikuara tani",
+    "runJobsHint": "Kujtesat, rezervimet me depozitë, skadimi i kërkesave, faturimi dhe pastrimi i kodeve OTP. Ekzekutohen edhe automatikisht çdo ditë.",
+    "jobsRan": "Punët e planifikuara u ekzekutuan: {ok} nga {total} me sukses."
   },
   "Profile": {
     "title": "Profili juaj",
@@ -282,5 +365,34 @@
     "save": "Ruaj",
     "success": "Profili u përditësua",
     "error": "Ndodhi një gabim"
+  },
+  "Pay": {
+    "testMode": "MODALITET TESTIMI",
+    "title": "Paguani depozitën",
+    "subtitle": "Orari juaj mbahet i rezervuar për {minutes} minuta ndërsa paguani.",
+    "deposit": "Depozita",
+    "pay": "Paguaj {amount}",
+    "cancel": "Anulo dhe liro orarin",
+    "released": "Kjo pagesë u anulua dhe orari u lirua.",
+    "refunded": "Pagesa juaj arriti pasi afati i rezervimit kishte skaduar, prandaj u rimbursua.",
+    "bookAgain": "Rezervo përsëri",
+    "mockNote": "Në këtë mjedis Dentbook përdor një ofrues pagesash testues: asnjë kartë nuk tarifohet dhe asnjë para nuk lëviz."
+  },
+  "Review": {
+    "title": "Si shkoi vizita juaj?",
+    "ratingLabel": "Vlerësimi juaj",
+    "commentLabel": "Koment (opsional)",
+    "commentPlaceholder": "Çfarë shkoi mirë? Çfarë mund të ishte më mirë?",
+    "submit": "Dërgo vlerësimin",
+    "thanks": "Faleminderit — vlerësimi juaj u publikua.",
+    "stars": "{count} nga 5 yje",
+    "notYet": "Vlerësimet hapen pasi vizita të përfundojë.",
+    "errors": {
+      "INVALID_INPUT": "Zgjidhni një vlerësim nga 1 deri në 5 (komenti deri në 1000 karaktere).",
+      "NOT_COMPLETED": "Vlerësimet hapen pasi vizita të përfundojë.",
+      "ALREADY_REVIEWED": "Ju e keni vlerësuar tashmë këtë vizitë.",
+      "NOT_FOUND": "Ky link vlerësimi nuk është i vlefshëm.",
+      "UNKNOWN": "Gabim i papritur"
+    }
   }
 }
