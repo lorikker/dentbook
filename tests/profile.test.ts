@@ -23,4 +23,8 @@ describe("updateProfile", () => {
     await expect(updateProfile(ctx, { name: "", locale: "en" }))
       .rejects.toThrow(ProfileError);
   });
+  it("never returns the password hash (the API route serialises this)", async () => {
+    const u = await updateProfile(ctx, { name: "Still Fine", locale: "sq" });
+    expect(u).not.toHaveProperty("passwordHash");
+  });
 });

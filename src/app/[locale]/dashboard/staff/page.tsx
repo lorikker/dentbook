@@ -21,31 +21,34 @@ export default async function StaffPage() {
     revalidatePath("/dashboard/staff");
   }
 
+  const inputClass = "border border-ink-line bg-ink-surface px-3 py-2.5 text-sm text-cream outline-none placeholder:text-muted-2 focus:border-accent";
+
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold">{t("title")}</h1>
-      <ul className="mb-8 flex flex-col gap-2">
+      <h1 className="font-display text-3xl font-bold tracking-tight">{t("title")}</h1>
+      <div className="mt-6 mb-10 grid gap-2.5">
         {staff.map((m) => (
-          <li key={m.id} className="rounded border p-3">
-            {m.user.name} — {m.role}{m.title ? ` · ${m.title}` : ""}
-            <span className="ml-2 text-sm text-gray-500">{m.user.email}</span>
-          </li>
+          <div key={m.id} className="border border-ink-line bg-ink-surface p-3.5">
+            <span className="font-semibold text-cream">{m.user.name}</span>
+            <span className="text-muted"> — {m.role}{m.title ? ` · ${m.title}` : ""}</span>
+            <span className="ml-2 text-sm text-muted-2">{m.user.email}</span>
+          </div>
         ))}
-      </ul>
+      </div>
       {ctx.role === "OWNER" && (
         <>
-          <h2 className="mb-2 font-semibold">{t("addTitle")}</h2>
-          <form action={addAction} className="flex max-w-md flex-col gap-2">
-            <input name="name" required placeholder={t("name")} className="rounded border p-2" />
-            <input name="email" type="email" required placeholder={t("email")} className="rounded border p-2" />
-            <input name="password" required placeholder={t("tempPassword")} className="rounded border p-2" />
-            <select name="role" className="rounded border p-2">
+          <h2 className="text-[11.5px] font-bold tracking-[0.13em] text-muted-2">{t("addTitle").toUpperCase()}</h2>
+          <form action={addAction} className="mt-3 flex max-w-md flex-col gap-2.5">
+            <input name="name" required placeholder={t("name")} className={inputClass} />
+            <input name="email" type="email" required placeholder={t("email")} className={inputClass} />
+            <input name="password" required placeholder={t("tempPassword")} className={inputClass} />
+            <select name="role" className={inputClass}>
               <option value="DENTIST">{t("roles.DENTIST")}</option>
               <option value="RECEPTIONIST">{t("roles.RECEPTIONIST")}</option>
               <option value="OWNER">{t("roles.OWNER")}</option>
             </select>
-            <input name="title" placeholder={t("titleField")} className="rounded border p-2" />
-            <button className="rounded bg-sky-600 p-2 text-white">{t("add")}</button>
+            <input name="title" placeholder={t("titleField")} className={inputClass} />
+            <button className="bg-accent px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-accent-hover">{t("add")}</button>
           </form>
         </>
       )}

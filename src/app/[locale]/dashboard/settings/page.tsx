@@ -29,41 +29,42 @@ export default async function SettingsPage() {
     revalidatePath("/dashboard/settings");
   }
 
+  const inputClass = "border border-ink-line bg-ink-surface px-3 py-2.5 text-sm text-cream outline-none placeholder:text-muted-2 focus:border-accent";
+
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold">{t("title")}</h1>
-      <form action={saveAction} className="flex max-w-md flex-col gap-2">
+      <h1 className="font-display text-3xl font-bold tracking-tight">{t("title")}</h1>
+      <form action={saveAction} className="mt-6 flex max-w-md flex-col gap-2.5">
         <input name="name" required defaultValue={clinic.name}
-               placeholder={t("name")} className="rounded border p-2" />
+               placeholder={t("name")} className={inputClass} />
         <input name="city" required defaultValue={clinic.city}
-               placeholder={t("city")} className="rounded border p-2" />
+               placeholder={t("city")} className={inputClass} />
         <input name="address" required defaultValue={clinic.address}
-               placeholder={t("address")} className="rounded border p-2" />
+               placeholder={t("address")} className={inputClass} />
         <input name="phone" required defaultValue={clinic.phone}
-               placeholder={t("phone")} className="rounded border p-2" />
+               placeholder={t("phone")} className={inputClass} />
         <textarea name="aboutSq" defaultValue={clinic.aboutSq} rows={3}
-                  placeholder={t("aboutSq")} className="rounded border p-2" />
+                  placeholder={t("aboutSq")} className={inputClass} />
         <textarea name="aboutEn" defaultValue={clinic.aboutEn} rows={3}
-                  placeholder={t("aboutEn")} className="rounded border p-2" />
-        <label className="flex items-center gap-2 text-sm">
+                  placeholder={t("aboutEn")} className={inputClass} />
+        <label className="flex items-center gap-2.5 text-sm text-muted">
           {t("brandColor")}
           <input name="brandColor" type="color" defaultValue={clinic.brandColor} />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1.5 text-sm text-muted">
           {t("bookingMode")}
-          <select name="bookingMode" defaultValue={clinic.bookingMode}
-                  className="rounded border p-2">
+          <select name="bookingMode" defaultValue={clinic.bookingMode} className={inputClass}>
             <option value="INSTANT">{t("modes.INSTANT")}</option>
             <option value="APPROVAL">{t("modes.APPROVAL")}</option>
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1.5 text-sm text-muted">
           {t("cancellationWindow")}
           <input name="cancellationWindowHours" type="number" min={0} max={168}
                  defaultValue={clinic.cancellationWindowHours}
-                 className="rounded border p-2" />
+                 className={inputClass} />
         </label>
-        <button className="rounded bg-sky-600 p-2 text-white">{t("save")}</button>
+        <button className="bg-accent px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-accent-hover">{t("save")}</button>
       </form>
     </div>
   );

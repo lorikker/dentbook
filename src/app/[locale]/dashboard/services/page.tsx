@@ -29,42 +29,41 @@ export default async function ServicesPage() {
     revalidatePath("/dashboard/services");
   }
 
+  const inputClass = "border border-ink-line bg-ink-surface px-3 py-2.5 text-sm text-cream outline-none placeholder:text-muted-2 focus:border-accent";
+
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold">{t("title")}</h1>
-      <table className="mb-8 w-full text-left">
-        <thead><tr className="border-b">
-          <th className="py-2">{t("name")}</th><th>{t("duration")}</th>
-          <th>{t("price")}</th><th>{t("deposit")}</th><th></th>
-        </tr></thead>
-        <tbody>
-          {services.map((s) => (
-            <tr key={s.id} className={`border-b ${s.active ? "" : "opacity-40"}`}>
-              <td className="py-2">{s.nameSq}</td>
-              <td>{s.durationMin} min</td>
-              <td>{String(s.priceEur)} €</td>
-              <td>{s.depositEur ? `${s.depositEur} €` : "—"}</td>
-              <td>
-                <form action={toggleAction}>
-                  <input type="hidden" name="id" value={s.id} />
-                  <input type="hidden" name="active" value={String(!s.active)} />
-                  <button className="text-sm text-sky-700 underline">
-                    {s.active ? t("deactivate") : t("activate")}
-                  </button>
-                </form>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <h2 className="mb-2 font-semibold">{t("addTitle")}</h2>
-      <form action={createAction} className="flex max-w-md flex-col gap-2">
-        <input name="nameSq" required placeholder={t("nameSq")} className="rounded border p-2" />
-        <input name="nameEn" required placeholder={t("nameEn")} className="rounded border p-2" />
-        <input name="durationMin" type="number" required placeholder={t("duration")} className="rounded border p-2" />
-        <input name="priceEur" type="number" step="0.01" required placeholder={t("price")} className="rounded border p-2" />
-        <input name="depositEur" type="number" step="0.01" placeholder={t("deposit")} className="rounded border p-2" />
-        <button className="rounded bg-sky-600 p-2 text-white">{t("add")}</button>
+      <h1 className="font-display text-3xl font-bold tracking-tight">{t("title")}</h1>
+      <div className="mt-6 mb-10 border border-ink-line">
+        {services.map((s) => (
+          <div
+            key={s.id}
+            className={`flex flex-wrap items-center justify-between gap-3 border-b border-ink-line bg-ink-surface px-5 py-3.5 last:border-b-0 ${s.active ? "" : "opacity-40"}`}
+          >
+            <span className="text-cream">{s.nameSq}</span>
+            <span className="flex items-center gap-5 text-sm text-muted">
+              <span>{s.durationMin} min</span>
+              <span className="font-semibold text-cream">{String(s.priceEur)} €</span>
+              <span>{s.depositEur ? `${s.depositEur} €` : "—"}</span>
+              <form action={toggleAction}>
+                <input type="hidden" name="id" value={s.id} />
+                <input type="hidden" name="active" value={String(!s.active)} />
+                <button className="font-semibold text-accent hover:text-accent-hover">
+                  {s.active ? t("deactivate") : t("activate")}
+                </button>
+              </form>
+            </span>
+          </div>
+        ))}
+      </div>
+      <h2 className="text-[11.5px] font-bold tracking-[0.13em] text-muted-2">{t("addTitle").toUpperCase()}</h2>
+      <form action={createAction} className="mt-3 flex max-w-md flex-col gap-2.5">
+        <input name="nameSq" required placeholder={t("nameSq")} className={inputClass} />
+        <input name="nameEn" required placeholder={t("nameEn")} className={inputClass} />
+        <input name="durationMin" type="number" required placeholder={t("duration")} className={inputClass} />
+        <input name="priceEur" type="number" step="0.01" required placeholder={t("price")} className={inputClass} />
+        <input name="depositEur" type="number" step="0.01" placeholder={t("deposit")} className={inputClass} />
+        <button className="bg-accent px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-accent-hover">{t("add")}</button>
       </form>
     </div>
   );

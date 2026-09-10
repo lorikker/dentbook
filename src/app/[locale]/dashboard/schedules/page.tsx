@@ -45,58 +45,60 @@ export default async function SchedulesPage() {
     revalidatePath("/dashboard/schedules");
   }
 
+  const inputClass = "border border-ink-line bg-ink-surface px-3 py-2.5 text-sm text-cream outline-none placeholder:text-muted-2 focus:border-accent";
+
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold">{t("title")}</h1>
-      <ul className="mb-8 flex flex-col gap-4">
+      <h1 className="font-display text-3xl font-bold tracking-tight">{t("title")}</h1>
+      <div className="mt-6 mb-10 grid gap-3 sm:grid-cols-2">
         {dentists.map((m) => (
-          <li key={m.id} className="rounded border p-3">
+          <div key={m.id} className="border border-ink-line bg-ink-surface p-4">
             <p className="font-semibold">{m.user.name}{m.title ? ` · ${m.title}` : ""}</p>
             {m.schedules.length === 0 && (
-              <p className="text-sm text-gray-500">{t("noSchedule")}</p>
+              <p className="mt-1 text-sm text-muted">{t("noSchedule")}</p>
             )}
-            <ul className="text-sm">
+            <ul className="mt-1 text-sm text-muted">
               {m.schedules.map((s) => (
                 <li key={s.id}>
                   {weekdays[s.weekday]}: {toHHmm(s.startMin)}–{toHHmm(s.endMin)}
                 </li>
               ))}
             </ul>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      <h2 className="mb-2 font-semibold">{t("setTitle")}</h2>
-      <form action={setAction} className="mb-8 flex max-w-md flex-col gap-2">
-        <select name="membershipId" required className="rounded border p-2">
+      <h2 className="text-[11.5px] font-bold tracking-[0.13em] text-muted-2">{t("setTitle").toUpperCase()}</h2>
+      <form action={setAction} className="mt-3 mb-10 flex max-w-md flex-col gap-2.5">
+        <select name="membershipId" required className={inputClass}>
           {dentists.map((m) => (
             <option key={m.id} value={m.id}>{m.user.name}</option>
           ))}
         </select>
         <textarea name="entries" rows={5} placeholder={t("entriesPlaceholder")}
-                  className="rounded border p-2 font-mono text-sm" />
-        <p className="text-xs text-gray-500">{t("entriesHint")}</p>
-        <button className="rounded bg-sky-600 p-2 text-white">{t("save")}</button>
+                  className={`${inputClass} font-mono`} />
+        <p className="text-xs text-muted-2">{t("entriesHint")}</p>
+        <button className="bg-accent px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-accent-hover">{t("save")}</button>
       </form>
 
-      <h2 className="mb-2 font-semibold">{t("exceptionTitle")}</h2>
-      <form action={exceptionAction} className="flex max-w-md flex-col gap-2">
-        <select name="membershipId" className="rounded border p-2">
+      <h2 className="text-[11.5px] font-bold tracking-[0.13em] text-muted-2">{t("exceptionTitle").toUpperCase()}</h2>
+      <form action={exceptionAction} className="mt-3 flex max-w-md flex-col gap-2.5">
+        <select name="membershipId" className={inputClass}>
           <option value="">{t("wholeClinic")}</option>
           {dentists.map((m) => (
             <option key={m.id} value={m.id}>{m.user.name}</option>
           ))}
         </select>
-        <input name="date" type="date" required className="rounded border p-2" />
-        <label className="flex items-center gap-2 text-sm">
+        <input name="date" type="date" required className={inputClass} />
+        <label className="flex items-center gap-2 text-sm text-muted">
           <input name="closed" type="checkbox" defaultChecked /> {t("closed")}
         </label>
-        <div className="flex gap-2">
-          <input name="start" type="time" className="flex-1 rounded border p-2" />
-          <input name="end" type="time" className="flex-1 rounded border p-2" />
+        <div className="flex gap-2.5">
+          <input name="start" type="time" className={`flex-1 ${inputClass}`} />
+          <input name="end" type="time" className={`flex-1 ${inputClass}`} />
         </div>
-        <p className="text-xs text-gray-500">{t("exceptionHint")}</p>
-        <button className="rounded bg-sky-600 p-2 text-white">{t("add")}</button>
+        <p className="text-xs text-muted-2">{t("exceptionHint")}</p>
+        <button className="bg-accent px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-accent-hover">{t("add")}</button>
       </form>
     </div>
   );

@@ -19,7 +19,16 @@ export async function updateProfile(ctx: { userId: string }, input: unknown) {
     // row via the WHERE clause, so the least-privileged self-scoped role
     // suffices; "auth" can reach any user row under the users RLS policy.
     return await withDbContext({ role: "patient", userId: ctx.userId }, (tx) =>
-      tx.user.update({ where: { id: ctx.userId }, data: parsed.data }));
+      tx.user.update({
+        where: { id: ctx.userId },
+        data: parsed.data,
+        // Explicit select: the API route serialises this straight to the
+        // browser, and the default row includes password_hash.
+        select: {
+          id: true, name: true, email: true, phone: true,
+          locale: true, isPlatformAdmin: true, createdAt: true,
+        },
+      }));
   } catch (e) {
     if (e && typeof e === "object" && "code" in e && e.code === "P2002") {
       throw new ProfileError("EMAIL_TAKEN");

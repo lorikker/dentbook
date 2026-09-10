@@ -34,36 +34,36 @@ export default async function RequestsPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold">{t("title")}</h1>
-      {pending.length === 0 && <p className="text-gray-500">{t("empty")}</p>}
-      <ul className="flex flex-col gap-2">
+      <h1 className="font-display text-3xl font-bold tracking-tight">{t("title")}</h1>
+      {pending.length === 0 && <p className="mt-4 text-muted">{t("empty")}</p>}
+      <div className="mt-6 grid gap-2.5">
         {pending.map((a) => (
-          <li key={a.id}
-              className="flex items-center justify-between rounded border p-3">
+          <div key={a.id}
+               className="flex flex-wrap items-center justify-between gap-3 border border-ink-line bg-ink-surface p-4">
             <span>
-              <span className="font-mono">
+              <span className="font-semibold text-cream">
                 {format.dateTime(a.startsAt, {
                   dateStyle: "medium", timeStyle: "short" })}
               </span>
-              {" — "}{a.patient.name} · {a.service.nameSq} · {a.membership.user?.name}
+              <span className="text-muted"> — {a.patient.name} · {a.service.nameSq} · {a.membership.user?.name}</span>
             </span>
             <span className="flex gap-2">
               <form action={acceptAction}>
                 <input type="hidden" name="id" value={a.id} />
-                <button className="rounded bg-green-600 px-3 py-1 text-sm text-white">
+                <button className="bg-accent px-3.5 py-1.5 text-sm font-bold text-ink transition-colors hover:bg-accent-hover">
                   {t("accept")}
                 </button>
               </form>
               <form action={declineAction}>
                 <input type="hidden" name="id" value={a.id} />
-                <button className="rounded border border-red-600 px-3 py-1 text-sm text-red-600">
+                <button className="border border-coral px-3.5 py-1.5 text-sm font-semibold text-coral transition-colors hover:bg-coral/10">
                   {t("decline")}
                 </button>
               </form>
             </span>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
