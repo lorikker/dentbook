@@ -20,7 +20,9 @@ export async function resolveStaffMembership(userId: string) {
 }
 
 /**
- * For server components/actions: redirects to login when not staff.
+ * For server components/actions: redirects to login when signed out, and to
+ * /register when signed in without a clinic (sending a signed-in user to the
+ * login page would only ask them to log in again).
  * next-auth and next/navigation are imported lazily so this module can be
  * loaded by vitest (next-auth's deep `next/server` import breaks node ESM).
  */
@@ -33,6 +35,6 @@ export async function requireStaff(): Promise<StaffContext> {
   const userId = session?.user?.id;
   if (!userId) return redirect("/login");
   const m = await resolveStaffMembership(userId);
-  if (!m) return redirect("/login");
+  if (!m) return redirect("/register");
   return { userId, ...m };
 }
