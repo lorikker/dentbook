@@ -7,13 +7,16 @@ const config: Config = {
   // Jest's glob path normalizer misreads `\.` as an escaped dot and matches 0 files.
   // testRegex avoids the glob path entirely.
   // NOTE 2: files use a `.jest.tsx` suffix (not `.test.tsx`) because Vitest's default
-  // `include` (`**/*.{test,spec}.*`, unrestricted in this repo's vitest.config.ts) would
-  // otherwise pick these Jest-only files up too and fail on them (no `vitest.config.ts`
-  // changes allowed here).
-  testRegex: "tests-jest[\\\\/].*\\.jest\\.tsx?$",
+  // `include` (`**/*.{test,spec}.*`) would otherwise pick these Jest-only files up too.
+  testRegex: "tests-jest[\\/].*\.jest\.tsx?$",
+  // NOTE 3: stale agent worktrees under `.claude/worktrees/<id>/tests-jest/` hold their
+  // own copies of these files. testRegex is unanchored, so without this the suite runs
+  // every copy against this repo's src (13 suites instead of 5) and they fail on drift.
+  // Mirrors the `include` anchor in vitest.config.ts.
+  testPathIgnorePatterns: ["/node_modules/", "<rootDir>/.claude/", "<rootDir>/.next/"],
   setupFiles: ["<rootDir>/tests-jest/setup-env.ts"],
   setupFilesAfterEnv: ["<rootDir>/tests-jest/setup.ts"],
-  transform: { "^.+\\.[tj]sx?$": ["babel-jest", { configFile: "./babel.config.jest.js" }] },
+  transform: { "^.+\.[tj]sx?$": ["babel-jest", { configFile: "./babel.config.jest.js" }] },
   moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
 };
 export default config;

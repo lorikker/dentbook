@@ -1,8 +1,66 @@
 {
   "Home": {
-    "title": "Find your dentist in Kosovo",
-    "subtitle": "Compare clinics, see open slots, and book online.",
-    "cta": "Browse clinics"
+    "kicker": "Kosovo's dental booking network",
+    "title": "Find the tooth.",
+    "titleAccent": "Book the chair.",
+    "subtitle": "Pick the tooth that hurts, see which clinics treat it, and confirm your slot with an SMS code. No account, no phone calls.",
+    "cta": "Browse clinics",
+    "ctaSecondary": "List your clinic",
+    "stats": {
+      "clinics": "Clinics listed",
+      "cities": "Cities covered",
+      "services": "Treatments listed"
+    },
+    "chart": {
+      "kicker": "Where does it hurt?",
+      "notation": "FDI notation",
+      "upper": "Upper",
+      "lower": "Lower",
+      "selected": "Selected",
+      "none": "Tap a tooth",
+      "cta": "Browse clinics",
+      "teeth": {
+        "wisdom": "Wisdom tooth",
+        "molar2": "2nd molar",
+        "molar1": "1st molar",
+        "premolar2": "2nd premolar",
+        "premolar1": "1st premolar",
+        "canine": "Canine",
+        "lateralIncisor": "Lateral incisor",
+        "centralIncisor": "Central incisor"
+      }
+    },
+    "steps": {
+      "kicker": "How it works",
+      "title": "Three steps, no phone call",
+      "1": {
+        "title": "Pick the tooth",
+        "body": "Tap the tooth on the chart or browse clinics directly — we don't need an account to get started."
+      },
+      "2": {
+        "title": "Choose a slot",
+        "body": "Filter by city and see real opening hours. Every clinic manages its own calendar."
+      },
+      "3": {
+        "title": "Confirm by SMS",
+        "body": "Enter your number, type the six-digit code, and you're booked. The clinic sees it instantly."
+      }
+    },
+    "featured": {
+      "kicker": "Featured clinics",
+      "title": "Recently listed",
+      "viewAll": "All clinics",
+      "new": "New clinic",
+      "reviews": "reviews",
+      "from": "from",
+      "view": "View clinic"
+    },
+    "cta2": {
+      "kicker": "For clinics",
+      "title": "List your clinic and fill the gaps in your calendar.",
+      "body": "Publish your services and open hours for free. You approve every request from your own dashboard.",
+      "button": "Register your clinic"
+    }
   },
   "Login": {
     "staffTitle": "Clinic sign-in",
@@ -17,6 +75,15 @@
     "fields": { "ownerName": "Your name", "email": "Email", "password": "Password",
       "clinicName": "Clinic name", "city": "City", "address": "Address", "phone": "Phone" },
     "errors": { "INVALID_INPUT": "Invalid input", "EMAIL_TAKEN": "This email is already taken", "UNKNOWN": "Unexpected error" }
+  },
+  "Auth": {
+    "loginTab": "Log in",
+    "registerTab": "Register clinic",
+    "orContinueAsPatient": "Or continue as a patient",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithFacebook": "Continue with Facebook",
+    "panelTitle": "{count} clinics already listed on Dentbook",
+    "panelBody": "Publish your services and open hours for free — patients book straight from your calendar."
   },
   "Dashboard": {
     "nav": {
@@ -94,7 +161,9 @@
     "anyDentist": "Any available dentist",
     "showSlots": "See free slots",
     "noSlots": "No free slots on this day",
-    "otherDate": "Pick another date",
+    "noSlotsInRange": "No free slots in the next 14 days — try picking a specific date",
+    "filterByDate": "Filter by date",
+    "showAllDates": "Show all dates",
     "yourName": "Your name",
     "yourPhone": "Phone number",
     "sendCode": "Send code",
@@ -118,13 +187,26 @@
   },
   "Clinics": {
     "title": "Clinics",
+    "kicker": "Directory",
     "allCities": "All cities",
     "empty": "No clinics found",
     "dentists": "Dentists",
     "services": "Services",
     "book": "Book",
     "addFavorite": "Add to favorites",
-    "removeFavorite": "Remove from favorites"
+    "removeFavorite": "Remove from favorites",
+    "searchPlaceholder": "Search by name",
+    "sortBy": "Sort by",
+    "sort": { "name": "Name", "rating": "Rating", "price": "Price" },
+    "maxPrice": "Max price",
+    "priceAny": "Any price",
+    "priceUnder": "Under {amount}€",
+    "resetFilters": "Reset filters",
+    "resultsOne": "1 clinic matches",
+    "resultsMany": "{count} clinics match",
+    "new": "New clinic",
+    "reviews": "reviews",
+    "from": "from"
   },
   "Manage": {
     "title": "Your appointment",

@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Stale agent worktrees carry full copies of this repo (their own src/ and
+    // node_modules/). Linting them buried the real findings under ~40k problems
+    // from code this repo does not ship. Mirrors the anchors in
+    // vitest.config.ts and jest.config.ts.
+    ".claude/**",
   ]),
 ]);
 

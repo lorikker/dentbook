@@ -4,16 +4,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "postinstall": "prisma generate",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:jest": "jest",
-    "db:start": "\"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_ctl.exe\" -D .pgdata -o \"-p 5433\" -l .pgdata/pg.log -w start",
-    "db:stop": "\"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_ctl.exe\" -D .pgdata stop",
+    "db:start": "node scripts/db.mjs start",
+    "db:stop": "node scripts/db.mjs stop",
+    "db:status": "node scripts/db.mjs status",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "cron:tick": "tsx scripts/cron-tick.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",

@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { direct, truncateAll } from "./helpers/db";
-import { getAvailableSlots, AvailabilityError } from "@/lib/availability";
+import {
+  getAvailableSlots, getAvailableSlotsRange, AvailabilityError,
+} from "@/lib/availability";
 
 const NOW = new Date("2027-01-01T00:00:00Z");
 const clinicSlug = "av-klinika";
@@ -83,6 +85,41 @@ describe("getAvailableSlots", () => {
   it("rejects malformed dates", async () => {
     await expect(getAvailableSlots({
       clinicSlug, serviceId, dateISO: "gabim", now: NOW }))
+      .rejects.toThrow(AvailabilityError);
+  });
+});
+
+describe("getAvailableSlotsRange", () => {
+  it("aggregates slots per day across the window, applying each day's own exceptions/busy times", async () => {
+    const slots = await getAvailableSlotsRange({
+      clinicSlug, serviceId, fromDateISO: "2027-01-15", toDateISO: "2027-01-22", now: NOW });
+    const jan15 = slots.filter((s) => s.startsAt.toISOString().startsWith("2027-01-15"));
+    const jan22 = slots.filter((s) => s.startsAt.toISOString().startsWith("2027-01-22"));
+    expect(jan15.length).toBeGreaterThan(0);
+    expect(jan15.map((s) => s.startsAt.toISOString()))
+      .not.toContain("2027-01-15T09:00:00.000Z"); // busy 10:00-11:00 wall
+    expect(jan22).toEqual([]); // clinic-wide closure
+  });
+  it("only includes dentists linked to the service", async () => {
+    const slots = await getAvailableSlotsRange({
+      clinicSlug, serviceId, fromDateISO: "2027-01-15", toDateISO: "2027-01-15", now: NOW });
+    expect(new Set(slots.map((s) => s.membershipId))).toEqual(new Set([drAId]));
+  });
+  it("filters to a specific dentist when membershipId is given", async () => {
+    const slots = await getAvailableSlotsRange({
+      clinicSlug, serviceId, membershipId: drBId,
+      fromDateISO: "2027-01-15", toDateISO: "2027-01-22", now: NOW });
+    expect(slots).toEqual([]); // Dr B is not linked to the service
+  });
+  it("rejects unpublished/unknown clinics", async () => {
+    await expect(getAvailableSlotsRange({
+      clinicSlug: "nuk-ka", serviceId,
+      fromDateISO: "2027-01-15", toDateISO: "2027-01-22", now: NOW }))
+      .rejects.toThrow(AvailabilityError);
+  });
+  it("rejects malformed dates", async () => {
+    await expect(getAvailableSlotsRange({
+      clinicSlug, serviceId, fromDateISO: "gabim", toDateISO: "2027-01-22", now: NOW }))
       .rejects.toThrow(AvailabilityError);
   });
 });

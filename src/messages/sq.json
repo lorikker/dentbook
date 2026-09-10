@@ -1,8 +1,66 @@
 {
   "Home": {
-    "title": "Gjej dentistin tënd në Kosovë",
-    "subtitle": "Krahaso klinikat, shiko oraret e lira dhe rezervo online.",
-    "cta": "Kërko klinika"
+    "kicker": "Rrjeti i rezervimeve dentare në Kosovë",
+    "title": "Gjej dhëmbin.",
+    "titleAccent": "Rezervo karrigen.",
+    "subtitle": "Zgjidh dhëmbin që të dhemb, shiko cilat klinika e trajtojnë, dhe konfirmo terminin me një kod SMS. Pa llogari, pa telefonata.",
+    "cta": "Kërko klinika",
+    "ctaSecondary": "Regjistro klinikën tënde",
+    "stats": {
+      "clinics": "Klinika të regjistruara",
+      "cities": "Qytete të mbuluara",
+      "services": "Shërbime të listuara"
+    },
+    "chart": {
+      "kicker": "Ku të dhemb?",
+      "notation": "Notacioni FDI",
+      "upper": "Sipër",
+      "lower": "Poshtë",
+      "selected": "Zgjedhur",
+      "none": "Zgjidh një dhëmb",
+      "cta": "Kërko klinika",
+      "teeth": {
+        "wisdom": "Dhëmbi i mençurisë",
+        "molar2": "Molari i 2-të",
+        "molar1": "Molari i 1-rë",
+        "premolar2": "Premolari i 2-të",
+        "premolar1": "Premolari i 1-rë",
+        "canine": "Syriz",
+        "lateralIncisor": "Prerësi anësor",
+        "centralIncisor": "Prerësi qendror"
+      }
+    },
+    "steps": {
+      "kicker": "Si funksionon",
+      "title": "Tri hapa, pa asnjë telefonatë",
+      "1": {
+        "title": "Zgjidh dhëmbin",
+        "body": "Prek dhëmbin në skemë ose shfleto klinikat drejtpërdrejt — nuk nevojitet llogari për të filluar."
+      },
+      "2": {
+        "title": "Zgjidh një orar",
+        "body": "Filtro sipas qytetit dhe shiko oraret reale të lira. Çdo klinikë menaxhon kalendarin e vet."
+      },
+      "3": {
+        "title": "Konfirmo me SMS",
+        "body": "Jep numrin tënd, shkruaj kodin gjashtëshifror, dhe termini u konfirmua. Klinika e sheh menjëherë."
+      }
+    },
+    "featured": {
+      "kicker": "Klinika të veçuara",
+      "title": "Të regjistruara së fundmi",
+      "viewAll": "Të gjitha klinikat",
+      "new": "Klinikë e re",
+      "reviews": "vlerësime",
+      "from": "nga",
+      "view": "Shiko klinikën"
+    },
+    "cta2": {
+      "kicker": "Për klinikat",
+      "title": "Regjistro klinikën tënde dhe mbush boshllëqet në kalendar.",
+      "body": "Publiko shërbimet dhe oraret e lira falas. Aprovon çdo kërkesë nga paneli yt.",
+      "button": "Regjistro klinikën"
+    }
   },
   "Login": {
     "staffTitle": "Hyrja për klinika",
@@ -17,6 +75,15 @@
     "fields": { "ownerName": "Emri juaj", "email": "Email", "password": "Fjalëkalimi",
       "clinicName": "Emri i klinikës", "city": "Qyteti", "address": "Adresa", "phone": "Telefoni" },
     "errors": { "INVALID_INPUT": "Të dhëna të pavlefshme", "EMAIL_TAKEN": "Ky email është i zënë", "UNKNOWN": "Gabim i papritur" }
+  },
+  "Auth": {
+    "loginTab": "Hyr",
+    "registerTab": "Regjistro klinikën",
+    "orContinueAsPatient": "Ose vazhdo si pacient",
+    "continueWithGoogle": "Vazhdo me Google",
+    "continueWithFacebook": "Vazhdo me Facebook",
+    "panelTitle": "{count} klinika tashmë të regjistruara në Dentbook",
+    "panelBody": "Publiko shërbimet dhe oraret e lira falas — pacientët rezervojnë drejtpërdrejt nga kalendari yt."
   },
   "Dashboard": {
     "nav": {
@@ -94,7 +161,9 @@
     "anyDentist": "Cilido dentist i lirë",
     "showSlots": "Shiko oraret e lira",
     "noSlots": "Nuk ka orare të lira për këtë ditë",
-    "otherDate": "Zgjidh datë tjetër",
+    "noSlotsInRange": "Nuk ka orare të lira në 14 ditët e ardhshme — provo të zgjedhësh një datë të caktuar",
+    "filterByDate": "Filtro sipas datës",
+    "showAllDates": "Shfaq të gjitha datat",
     "yourName": "Emri juaj",
     "yourPhone": "Numri i telefonit",
     "sendCode": "Dërgo kodin",
@@ -118,13 +187,26 @@
   },
   "Clinics": {
     "title": "Klinikat",
+    "kicker": "Drejtoria",
     "allCities": "Të gjitha qytetet",
     "empty": "Nuk u gjet asnjë klinikë",
     "dentists": "Dentistët",
     "services": "Shërbimet",
     "book": "Rezervo",
     "addFavorite": "Shto te të preferuarat",
-    "removeFavorite": "Hiq nga të preferuarat"
+    "removeFavorite": "Hiq nga të preferuarat",
+    "searchPlaceholder": "Kërko sipas emrit",
+    "sortBy": "Rendit sipas",
+    "sort": { "name": "Emri", "rating": "Vlerësimi", "price": "Çmimi" },
+    "maxPrice": "Çmimi maksimal",
+    "priceAny": "Çdo çmim",
+    "priceUnder": "Nën {amount}€",
+    "resetFilters": "Rivendos filtrat",
+    "resultsOne": "1 klinikë përputhet",
+    "resultsMany": "{count} klinika përputhen",
+    "new": "Klinikë e re",
+    "reviews": "vlerësime",
+    "from": "nga"
   },
   "Manage": {
     "title": "Termini juaj",
