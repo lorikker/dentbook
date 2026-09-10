@@ -52,7 +52,7 @@ content.
 | Styling | Tailwind CSS v4 |
 | i18n | next-intl (Albanian / English) |
 | Auth | Auth.js (NextAuth v5), JWT sessions |
-| Primary database | PostgreSQL, via Prisma, with Row-Level Security enforcing multi-tenancy |
+| Primary database | PostgreSQL, via Prisma, with Row-Level Security enforcing multi-tenancy — [Supabase](https://supabase.com) in production, local Postgres for dev/tests |
 | Secondary database | MongoDB, via Mongoose — scoped to non-tenant data (contact messages, activity log, testimonials) |
 | Testing | Vitest (integration tests against real Postgres/Mongo) + Jest/React Testing Library (component and API-route tests) |
 
@@ -61,7 +61,9 @@ content.
 ### Prerequisites
 
 - Node.js 20+
-- PostgreSQL 17 running locally (or update `DATABASE_URL` to point elsewhere)
+- PostgreSQL 17 running locally for dev (`npm run db:start`), or point
+  `DATABASE_URL` / `DIRECT_DATABASE_URL` at a Supabase project instead —
+  production runs against Supabase (see [Deployment](#deployment))
 - MongoDB running locally (only needed for `npm run dev` — tests spin up an
   in-memory MongoDB automatically)
 
@@ -128,10 +130,14 @@ over subscriptions/invoices, and pruning expired OTP codes.
 ## Deployment
 
 Deploy on [Vercel](https://vercel.com/new). Set every variable from
-`.env.example` in the project's environment settings, pointed at your
-production Postgres and MongoDB instances — including `CRON_SECRET`, so
-Vercel Cron can call `/api/cron/tick` — and run `npx prisma migrate
-deploy` against the production database before the first deploy.
+`.env.example` in the project's environment settings — `DATABASE_URL` and
+`DIRECT_DATABASE_URL` pointed at a [Supabase](https://supabase.com) Postgres
+project (the app role and superuser connection strings from Supabase's
+connection-pooler settings, respectively) and `MONGODB_URI` at a hosted
+MongoDB instance (e.g. Atlas) — including `CRON_SECRET`, so Vercel Cron can
+call `/api/cron/tick` — and run `npx prisma migrate deploy` against Supabase
+before the first deploy. Deploying to Vercel's Dublin region (`dub1`) keeps
+database round trips local, since Supabase's `eu-west-1` region is Ireland.
 
 - **Live URL:** _add once deployed_
 - **Screenshots:** _add here_
