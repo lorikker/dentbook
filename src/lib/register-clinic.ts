@@ -4,7 +4,10 @@ import { hashPassword } from "./staff-auth";
 import { logActivity } from "./models/activity-log";
 
 export class RegisterError extends Error {
-  constructor(public code: "INVALID_INPUT" | "EMAIL_TAKEN") { super(code); }
+  constructor(public code:
+    | "NAME_TOO_SHORT" | "INVALID_EMAIL" | "PASSWORD_TOO_SHORT"
+    | "CLINIC_NAME_TOO_SHORT" | "CITY_TOO_SHORT" | "ADDRESS_TOO_SHORT"
+    | "PHONE_TOO_SHORT" | "EMAIL_TAKEN" | "INVALID_INPUT") { super(code); }
 }
 
 const schema = z.object({
@@ -18,6 +21,17 @@ const schema = z.object({
 });
 export type RegisterInput = z.infer<typeof schema>;
 
+/** Each field carries exactly one rule above, so its path maps to one code. */
+const FIELD_ERROR_CODE: Record<string, RegisterError["code"]> = {
+  ownerName: "NAME_TOO_SHORT",
+  email: "INVALID_EMAIL",
+  password: "PASSWORD_TOO_SHORT",
+  clinicName: "CLINIC_NAME_TOO_SHORT",
+  city: "CITY_TOO_SHORT",
+  address: "ADDRESS_TOO_SHORT",
+  phone: "PHONE_TOO_SHORT",
+};
+
 export function slugify(name: string): string {
   return name.toLowerCase()
     .replaceAll("ë", "e").replaceAll("ç", "c")
@@ -26,7 +40,10 @@ export function slugify(name: string): string {
 
 export async function registerClinic(input: RegisterInput) {
   const parsed = schema.safeParse(input);
-  if (!parsed.success) throw new RegisterError("INVALID_INPUT");
+  if (!parsed.success) {
+    const field = String(parsed.error.issues[0]?.path[0] ?? "");
+    throw new RegisterError(FIELD_ERROR_CODE[field] ?? "INVALID_INPUT");
+  }
   const d = parsed.data;
   const passwordHash = await hashPassword(d.password);
 

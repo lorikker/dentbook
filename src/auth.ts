@@ -6,6 +6,7 @@ import { z } from "zod";
 import { verifyOtp } from "@/lib/otp";
 import { verifyStaffLogin } from "@/lib/staff-auth";
 import { isEmailLinkableForOAuth, upsertOAuthUser } from "@/lib/oauth-user";
+import { facebookEnabled, googleEnabled } from "@/lib/oauth-config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -46,14 +47,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                  isPlatformAdmin: user.isPlatformAdmin, kind: "staff" as const };
       },
     }),
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-    Facebook({
-      clientId: process.env.FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    }),
+    // Registered only when credentials exist. Auth.js happily accepts an
+    // empty clientId and then hands the user the provider's own error page,
+    // so an unconfigured deployment is better off with no button at all —
+    // the login page hides them using the same predicate.
+    ...(googleEnabled()
+      ? [Google({
+          clientId: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        })]
+      : []),
+    ...(facebookEnabled()
+      ? [Facebook({
+          clientId: process.env.FACEBOOK_CLIENT_ID,
+          clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+        })]
+      : []),
   ],
   callbacks: {
     async signIn({ account, profile }) {

@@ -38,8 +38,38 @@ describe("registerClinic", () => {
     await expect(registerClinic(INPUT)).rejects.toThrow(RegisterError);
   });
 
-  it("rejects invalid input (short password)", async () => {
+  it("rejects a too-short password with a specific code", async () => {
     await expect(registerClinic({ ...INPUT, password: "x" }))
-      .rejects.toThrow(RegisterError);
+      .rejects.toMatchObject({ code: "PASSWORD_TOO_SHORT" });
+  });
+
+  it("rejects a malformed email with a specific code", async () => {
+    await expect(registerClinic({ ...INPUT, email: "not-an-email" }))
+      .rejects.toMatchObject({ code: "INVALID_EMAIL" });
+  });
+
+  it("rejects a too-short owner name with a specific code", async () => {
+    await expect(registerClinic({ ...INPUT, ownerName: "A" }))
+      .rejects.toMatchObject({ code: "NAME_TOO_SHORT" });
+  });
+
+  it("rejects a too-short clinic name with a specific code", async () => {
+    await expect(registerClinic({ ...INPUT, clinicName: "A" }))
+      .rejects.toMatchObject({ code: "CLINIC_NAME_TOO_SHORT" });
+  });
+
+  it("rejects a too-short city with a specific code", async () => {
+    await expect(registerClinic({ ...INPUT, city: "A" }))
+      .rejects.toMatchObject({ code: "CITY_TOO_SHORT" });
+  });
+
+  it("rejects a too-short address with a specific code", async () => {
+    await expect(registerClinic({ ...INPUT, address: "A" }))
+      .rejects.toMatchObject({ code: "ADDRESS_TOO_SHORT" });
+  });
+
+  it("rejects a too-short phone with a specific code", async () => {
+    await expect(registerClinic({ ...INPUT, phone: "123" }))
+      .rejects.toMatchObject({ code: "PHONE_TOO_SHORT" });
   });
 });
