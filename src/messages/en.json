@@ -307,7 +307,8 @@
     "listClinic": "List your clinic",
     "profile": "Profile",
     "admin": "Admin",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "myBookings": "My bookings"
   },
   "About": {
     "title": "About Dentbook",
@@ -394,5 +395,9 @@
       "NOT_FOUND": "This review link isn't valid.",
       "UNKNOWN": "Unexpected error"
     }
+  },
+  "Bookings": {
+    "title": "Your bookings",
+    "empty": "You have no bookings yet."
   }
 }

@@ -47,12 +47,15 @@ export async function Header() {
         {session ? (
           <>
             {session.user.kind === "patient" && (
-              <Link
-                href="/favorites"
-                className="flex items-center gap-1.5 border border-ink-line px-3 py-2 text-sm text-cream transition-colors hover:border-ink-line-hover"
-              >
-                <span className="text-coral" aria-hidden="true">♥</span> {favCount}
-              </Link>
+              <>
+                <Link href="/bookings" className={navLinkClass}>{t("myBookings")}</Link>
+                <Link
+                  href="/favorites"
+                  className="flex items-center gap-1.5 border border-ink-line px-3 py-2 text-sm text-cream transition-colors hover:border-ink-line-hover"
+                >
+                  <span className="text-coral" aria-hidden="true">♥</span> {favCount}
+                </Link>
+              </>
             )}
             <Link
               href="/profile"

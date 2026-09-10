@@ -307,7 +307,8 @@
     "listClinic": "Regjistro klinikën",
     "profile": "Profili",
     "admin": "Admin",
-    "signOut": "Dil"
+    "signOut": "Dil",
+    "myBookings": "Rezervimet e mia"
   },
   "About": {
     "title": "Rreth Dentbook",
@@ -394,5 +395,9 @@
       "NOT_FOUND": "Ky link vlerësimi nuk është i vlefshëm.",
       "UNKNOWN": "Gabim i papritur"
     }
+  },
+  "Bookings": {
+    "title": "Rezervimet tuaja",
+    "empty": "Nuk keni ende asnjë rezervim."
   }
 }
