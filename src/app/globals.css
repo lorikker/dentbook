@@ -8,8 +8,27 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fallback stacks matter: Pages Router routes (src/pages/) never mount
+     next/font, so --font-archivo / --font-bricolage are undefined there and
+     a bare var() would make the whole declaration invalid. */
+  --font-sans: var(--font-archivo, ui-sans-serif), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: var(--font-bricolage, ui-sans-serif), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Dentbook dark UI system — used by Header/Footer and any redesigned
+     page. Kept as named tokens (not the global body background) so
+     not-yet-redesigned pages keep their original light styling. */
+  --color-ink: #0e0f0d;
+  --color-ink-surface: #131410;
+  --color-ink-line: #2a2c26;
+  --color-ink-line-hover: #63665a;
+  --color-cream: #f2efe6;
+  --color-muted: #98988c;
+  --color-muted-2: #7c7c72;
+  --color-accent: #9db8f5;
+  --color-accent-hover: #c3d3fb;
+  --color-coral: #f2724f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +38,62 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    /* Must stay inside @layer base. Unlayered CSS outranks every cascade
+       layer, so an unlayered body rule here beats Tailwind's .font-sans
+       utility (@layer utilities) — which is why Archivo was being
+       downloaded and preloaded on every page but never actually rendered. */
+    font-family: var(--font-archivo, ui-sans-serif), ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+}
+
+@keyframes db-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes db-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes db-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .15; }
+}
+
+@keyframes db-tick {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes db-scan {
+  0% { top: 0; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.animate-db-up {
+  animation: db-up .7s both;
+}
+
+.animate-db-in {
+  animation: db-in .6s both;
+}
+
+.animate-db-blink {
+  animation: db-blink 2.2s infinite;
+}
+
+.animate-db-tick {
+  animation: db-tick 40s linear infinite;
+}
+
+.animate-db-scan {
+  animation: db-scan 3s linear infinite;
 }

@@ -10,6 +10,14 @@ jest.mock("next-intl/server", () => ({
   getTranslations: jest.fn().mockResolvedValue((key: string) => key),
 }));
 
+// Same Prisma-under-Jest incompatibility documented in profile-route.jest.ts:
+// mock the lib boundary so this render test never touches the real client.
+// Header only calls this for logged-in patients, which isn't exercised below,
+// but importing @/components/Header still pulls the module in transitively.
+jest.mock("@/lib/favorites", () => ({
+  countFavorites: jest.fn().mockResolvedValue(0),
+}));
+
 describe("Header", () => {
   it("renders nav links and shows login when logged out", async () => {
     render(await Header());

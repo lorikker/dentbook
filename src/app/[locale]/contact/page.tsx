@@ -2,9 +2,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/Button";
+import { Container } from "@/components/Container";
 
 type FormValues = { name: string; email: string; message: string };
+
+const inputClass =
+  "border border-ink-line bg-ink-surface px-3.5 py-3 text-cream outline-none placeholder:text-muted-2 focus:border-accent";
 
 export default function ContactPage() {
   const t = useTranslations("Contact");
@@ -22,21 +25,25 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-md p-8">
-      <h1 className="mb-4 text-2xl font-bold">{t("title")}</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        <input {...register("name", { required: true })} placeholder={t("name")} className="rounded border p-2" />
-        {errors.name && <p className="text-sm text-red-600">{t("required")}</p>}
-        <input {...register("email", { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ })}
-               placeholder={t("email")} className="rounded border p-2" />
-        {errors.email && <p className="text-sm text-red-600">{t("invalidEmail")}</p>}
-        <textarea {...register("message", { required: true })} rows={4}
-                  placeholder={t("message")} className="rounded border p-2" />
-        {errors.message && <p className="text-sm text-red-600">{t("required")}</p>}
-        <Button type="submit">{t("submit")}</Button>
-        {status === "success" && <p className="text-sm text-green-600">{t("success")}</p>}
-        {status === "error" && <p className="text-sm text-red-600">{t("error")}</p>}
-      </form>
-    </main>
+    <div className="bg-ink text-cream">
+      <Container size="narrow" className="py-16">
+        <h1 className="font-display text-4xl font-bold tracking-tight">{t("title")}</h1>
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 flex max-w-md flex-col gap-3">
+          <input {...register("name", { required: true })} placeholder={t("name")} className={inputClass} />
+          {errors.name && <p className="text-sm text-coral">{t("required")}</p>}
+          <input {...register("email", { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ })}
+                 placeholder={t("email")} className={inputClass} />
+          {errors.email && <p className="text-sm text-coral">{t("invalidEmail")}</p>}
+          <textarea {...register("message", { required: true })} rows={4}
+                    placeholder={t("message")} className={inputClass} />
+          {errors.message && <p className="text-sm text-coral">{t("required")}</p>}
+          <button type="submit" className="bg-accent px-5 py-3.5 text-base font-bold text-ink transition-colors hover:bg-accent-hover">
+            {t("submit")}
+          </button>
+          {status === "success" && <p className="text-sm text-accent">{t("success")}</p>}
+          {status === "error" && <p className="text-sm text-coral">{t("error")}</p>}
+        </form>
+      </Container>
+    </div>
   );
 }

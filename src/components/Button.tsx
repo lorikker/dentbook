@@ -3,10 +3,10 @@ import type { ButtonHTMLAttributes } from "react";
 
 type Variant = "primary" | "secondary";
 
-const baseClasses = "rounded px-4 py-2 font-medium";
+const baseClasses = "px-4 py-2.5 text-sm font-semibold transition-colors";
 const variantClasses: Record<Variant, string> = {
-  primary: "bg-sky-600 text-white",
-  secondary: "border",
+  primary: "bg-accent text-ink hover:bg-accent-hover",
+  secondary: "border border-ink-line text-cream hover:border-ink-line-hover",
 };
 
 function classesFor(variant: Variant, className?: string) {
